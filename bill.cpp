@@ -1,62 +1,64 @@
-#ifndef PROVIDER_H
-#define PROVIDER_H
+#ifndef BILL_H
+#define BILL_H
 
 #include <iostream>
-#include <list>
-#include "utilityService.h"
 
 using namespace std;
 
 // ************************************************************
 //
-//  Class: provider
+//  Class: bill
 //
-//  Description: Represents a company providing utilities.
+//  Description: Tracks customer payments.
 //
 // ************************************************************
-class provider
+class bill
 {
 private:
+    int billID;
+    int customerID;
+    int serviceID;
     int providerID;
-    string providerName;
-    list<utilityService *> servicesOffered;
+    double amount;
+    string dueDate;
+    string status; // "paid" or "default"
 
 public:
     // ************************************************************
     //
-    //  Constructor: provider
+    //  Constructor: bill
     //
-    //  Description: Creates a utility provider.
+    //  Description: Creates a new bill object.
     //
     // ************************************************************
-    provider(int id, const string &name);
+    bill(int id, int custID, int servID, int provID, double amt, const string &date, const string &stat);
 
     // ************************************************************
     //
-    //  Function: addService
+    //  Function: generateBill
     //
-    //  Description: Adds a utility service to the provider.
+    //  Description: Generates a bill for a customer.
     //
     // ************************************************************
-    void addService(utilityService *service);
+    void generateBill();
 
     // ************************************************************
     //
-    //  Function: getServiceRate
+    //  Function: checkOverdue
     //
-    //  Description: Retrieves the rate for a given service.
+    //  Description: Checks if a bill is overdue.
     //
     // ************************************************************
-    double getServiceRate(int serviceID);
+    bool checkOverdue();
 
     // ************************************************************
     //
-    //  Function: listAllServices
+    //  Function: markPaid
     //
-    //  Description: Displays all services offered by the provider.
+    //  Description: Marks the bill as paid.
     //
     // ************************************************************
-    void listAllServices();
+    void markPaid();
 };
 
 #endif

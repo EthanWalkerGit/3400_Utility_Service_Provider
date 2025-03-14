@@ -1,51 +1,46 @@
-#ifndef UTILITYSERVICE_H
-#define UTILITYSERVICE_H
+#ifndef DATABASEMANAGER_H
+#define DATABASEMANAGER_H
 
 #include <iostream>
+
 using namespace std;
 
 // ************************************************************
 //
-//  Class: utilityService
+//  Class: databaseManager
 //
-//  Description: Represents a general utility service.
+//  Description: Handles database operations.
 //
 // ************************************************************
-class utilityService
+class databaseManager
 {
-private:
-    int serviceID;
-    string serviceName;
-    double ratePerUnit;
-    double fixedCharge;
-
 public:
     // ************************************************************
     //
-    //  Constructor: utilityService
+    //  Function: saveData
     //
-    //  Description: Creates a utility service object.
+    //  Description: Saves customer, provider, and billing data.
     //
     // ************************************************************
-    utilityService(int id, const string &name, double rate, double charge);
+    void saveData();
 
     // ************************************************************
     //
-    //  Function: getRate
+    //  Function: loadData
     //
-    //  Description: Returns the rate per unit for the service.
+    //  Description: Loads data from the database.
     //
     // ************************************************************
-    double getRate();
+    void loadData();
 
     // ************************************************************
     //
-    //  Function: calculateBill
+    //  Function: updatePaymentStatus
     //
-    //  Description: Calculates the bill for a given usage.
+    //  Description: Updates a customer's payment status.
     //
     // ************************************************************
-    double calculateBill(double usage);
+    void updatePaymentStatus(int billID, const string &status);
 };
 
 #endif

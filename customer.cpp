@@ -1,15 +1,18 @@
+#ifndef CUSTOMER_H
+#define CUSTOMER_H
+
 #include <iostream>
 
 using namespace std;
 
 // ************************************************************
 //
-//	Class: customer
+//  Class: customer
 //
-// 	Description: read orders from file
+//  Description: Represents a customer subscribing to utilities.
 //
 // ************************************************************
-class Customer
+class customer
 {
 private:
     int customerID;
@@ -19,37 +22,39 @@ private:
 public:
     // ************************************************************
     //
-    //	Constructor: customer
+    //  Constructor: customer
     //
-    // 	Description: creates a new customer object
+    //  Description: Creates a new customer object.
     //
     // ************************************************************
-    Customer(int id, const string &name, const string &address);
+    customer(int id, const string &name, const string &address);
 
     // ************************************************************
     //
-    //	Function: subscribeService
+    //  Function: subscribeService
     //
-    // 	Description: subscribes a customer to a service
+    //  Description: Subscribes a customer to a service.
     //
     // ************************************************************
     void subscribeService();
 
     // ************************************************************
     //
-    //	Function: viewBill
+    //  Function: viewBill
     //
-    // 	Description: allows a user to view their bill status
+    //  Description: Allows a user to view their bill status.
     //
     // ************************************************************
     void viewBill();
 
     // ************************************************************
     //
-    //	Function: makePayment
+    //  Function: makePayment
     //
-    // 	Description: allows a customer to pay a bill
+    //  Description: Allows a customer to pay a bill.
     //
     // ************************************************************
     void makePayment();
 };
+
+#endif
