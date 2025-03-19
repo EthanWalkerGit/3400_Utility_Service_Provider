@@ -1,5 +1,3 @@
-#include <iostream>
-#include <vector>
 #include "customer.h"
 
 using namespace std;
@@ -13,10 +11,23 @@ using namespace std;
 // ************************************************************
 int main()
 {
-    vector<Customer> customers = // hardcode 3 customers with IDs 1, 2, and 3
-        {Customer(1, "Alice Johnson", "123 Maple St"),
-         Customer(2, "Bob Smith", "456 Oak Ave"),
-         Customer(3, "Charlie Brown", "789 Pine Rd")};
+    DatabaseManager dbManager;
+
+    // Open the database
+    if (!dbManager.openDatabase("utilityproviders.db"))
+    {
+        return 1; // Exit if the database couldn't be opened
+    }
+
+    // initialize tables in database if not done so already
+    dbManager.initTables();
+
+    // Initialize customers directly
+    Customer customer1(dbManager, "Alice Johnson", "123 Maple St");
+    Customer customer2(dbManager, "Bob Smith", "456 Oak Ave");
+    Customer customer3(dbManager, "Charlie Brown", "789 Pine Rd");
+
+    std::vector<Customer> customers = {customer1, customer2, customer3};
 
     Customer *currentCustomer = nullptr; // pointer to logged-in customer
 
@@ -107,6 +118,8 @@ int main()
             break; // Return to login menu
         }
     }
+
+    dbManager.closeDatabase();
 
     return 0;
 }

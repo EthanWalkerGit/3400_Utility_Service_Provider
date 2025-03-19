@@ -1,7 +1,10 @@
 #ifndef DATABASEMANAGER_H
 #define DATABASEMANAGER_H
 
-#include <sqlite3.h>
+extern "C"
+{
+#include "sqlite3.h"
+}
 #include <iostream>
 #include <string>
 
@@ -17,6 +20,8 @@ public:
     bool openDatabase(const std::string &dbName);
     void closeDatabase();
     bool executeQuery(const std::string &query);
+    int getLastInsertId();
+    void initTables();
 };
 
 #endif

@@ -7,11 +7,20 @@
 //  Description: Creates a new customer object.
 //
 // ************************************************************
-Customer::Customer(int id, const string &name, const string &address)
+
+Customer::Customer(DatabaseManager &db, const string &name, const string &address)
 {
-    this->customerID = id;   // each customer has an id
     this->name = name;       // each customer has a name
     this->address = address; // each customer has an address
+
+    // Construct the SQL query string
+    string query = "INSERT INTO Customers (name, address) VALUES ('" + name + "', '" + address + "');";
+
+    // Execute the query
+    db.executeQuery(query);
+
+    // Retrieve the last inserted customer ID
+    this->customerID = db.getLastInsertId();
 }
 
 // ************************************************************
@@ -120,7 +129,6 @@ Customer *Customer::registerAccount(vector<Customer> &customers, int id, const s
         }
     }
 
-    customers.push_back(Customer(id, name, address)); // create a new customer and add to the vector
     cout << "\nAccount created successfully!\n";
     return &customers.back(); // return refference to newly added customer at back of vector
 }

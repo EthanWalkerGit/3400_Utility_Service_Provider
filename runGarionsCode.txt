@@ -1,2 +1,0 @@
-g++ -std=c++20 main_g.cpp customer.cpp bill.cpp -o main_g
-./main_g

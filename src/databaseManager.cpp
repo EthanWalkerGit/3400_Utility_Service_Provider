@@ -65,3 +65,22 @@ bool DatabaseManager::executeQuery(const string &query)
         return true;
     }
 }
+
+// Method to get the last inserted row ID
+int DatabaseManager::getLastInsertId()
+{
+    return static_cast<int>(sqlite3_last_insert_rowid(db));
+}
+
+void DatabaseManager::initTables()
+{
+    const string createCustomers = R"(
+        CREATE TABLE IF NOT EXISTS Customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            address TEXT NOT NULL
+        );
+    )";
+
+    DatabaseManager::executeQuery(createCustomers);
+}

@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 #include "bill.h"
+#include "databaseManager.h"
 
 using namespace std;
 
@@ -30,7 +32,7 @@ public:
     //  Description: Creates a new customer object.
     //
     // ************************************************************
-    Customer(int id, const string &name, const string &address);
+    Customer(DatabaseManager &db, const string &name, const string &address);
 
     // ************************************************************
     //
