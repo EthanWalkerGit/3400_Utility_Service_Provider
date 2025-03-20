@@ -8,19 +8,11 @@
 //
 // ************************************************************
 
-Customer::Customer(DatabaseManager &db, const string &name, const string &address)
+Customer::Customer(const int &id, const string &name, const string &address)
 {
     this->name = name;       // each customer has a name
     this->address = address; // each customer has an address
-
-    // Construct the SQL query string
-    string query = "INSERT INTO Customers (name, address) VALUES ('" + name + "', '" + address + "');";
-
-    // Execute the query
-    db.executeQuery(query);
-
-    // Retrieve the last inserted customer ID
-    this->customerID = db.getLastInsertId();
+    this->customerID = id;
 }
 
 // ************************************************************

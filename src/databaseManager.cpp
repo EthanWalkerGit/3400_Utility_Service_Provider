@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 #include "provider.h"       // Include your provider header
 #include "UtilityService.h" // Include your UtilityService header
+#include "customer.h"
 
 using std::cerr;
 using std::cout;
@@ -189,7 +190,7 @@ void DatabaseManager::insertData()
 }
 
 // Load data into providers and services
-void DatabaseManager::LoadData(std::vector<provider> &providers, std::vector<UtilityService> &services)
+void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityService> &services, vector<Customer> &customers)
 {
     sqlite3 *db = getConnection(); // Get the database connection
 
@@ -215,4 +216,23 @@ void DatabaseManager::LoadData(std::vector<provider> &providers, std::vector<Uti
     }
 
     sqlite3_finalize(stmt); // Finalize the statement
+
+    const char *sql2 = "SELECT customer_id, customer_name, address FROM Customers;";
+    sqlite3_stmt *stmt2;
+
+    if (sqlite3_prepare_v2(db, sql2, -1, &stmt2, nullptr) != SQLITE_OK)
+    {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return; // No need to close db here, as it is managed by DatabaseManager
+    }
+
+    while (sqlite3_step(stmt2) == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt2, 0);
+        string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 1));
+        string address = reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 1));
+        customers.emplace_back(id, name, address);
+    }
+
+    sqlite3_finalize(stmt2); // Finalize the statement
 }

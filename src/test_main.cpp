@@ -1,6 +1,7 @@
 #include "customer.h"
 #include "UtilityService.h"
 #include "provider.h"
+#include "DatabaseManager.h"
 
 using namespace std;
 
@@ -27,14 +28,9 @@ int main()
 
     vector<provider> providers;
     vector<UtilityService> services;
+    vector<Customer> customers;
 
-    dbManager.LoadData(providers, services);
-    // Initialize customers directly
-    Customer customer1(dbManager, "Alice Johnson", "123 Maple St");
-    Customer customer2(dbManager, "Bob Smith", "456 Oak Ave");
-    Customer customer3(dbManager, "Charlie Brown", "789 Pine Rd");
-
-    std::vector<Customer> customers = {customer1, customer2, customer3};
+    dbManager.LoadData(providers, services, customers);
 
     Customer *currentCustomer = nullptr; // pointer to logged-in customer
 

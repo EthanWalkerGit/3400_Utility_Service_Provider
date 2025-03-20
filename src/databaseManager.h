@@ -10,6 +10,7 @@ extern "C"
 #include <vector>
 #include "UtilityService.h"
 #include "provider.h"
+#include "customer.h"
 
 using namespace std;
 
@@ -22,15 +23,18 @@ public:
     DatabaseManager();
     ~DatabaseManager();
 
+    // opens database using the string provided
     bool openDatabase(const std::string &dbName);
+    // closes database connection
     void closeDatabase();
+    // executes SQL query string passed to the function
     bool executeQuery(const std::string &query);
     int getLastInsertId();
     void initTables();
     void resetDatabase();
     void insertData();
     sqlite3 *getConnection();
-    void LoadData(vector<provider> &providers, vector<UtilityService> &services);
+    void LoadData(vector<provider> &providers, vector<UtilityService> &services, vector<Customer> &customers);
 };
 
 #endif
