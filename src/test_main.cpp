@@ -1,0 +1,167 @@
+#include "customer.h"
+#include "UtilityService.h"
+#include "provider.h"
+
+using namespace std;
+
+void LoadData(vector<provider> &providers, vector<UtilityService> &services)
+{
+    sqlite3 *db;
+    if (sqlite3_open("utilityproviders.db", &db))
+    {
+        cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+
+    const char *sql = "SELECT providers.providerID, providers.P_Name, services.serviceID, services.S_Name, services.rate_per_unit, services.fixed_charge FROM providers JOIN services ON providers.providerID = services.providerID;";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        sqlite3_close(db);
+        return;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int pid = sqlite3_column_int(stmt, 0);
+        string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        int sid = sqlite3_column_int(stmt, 2);
+        string s_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+        double rpu = sqlite3_column_double(stmt, 4);
+        double fc = sqlite3_column_double(stmt, 5);
+        providers.emplace_back(pid, p_name);
+        services.emplace_back(sid, s_name, rpu, fc, pid);
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+// ************************************************************
+//
+//  Function: main
+//
+//  Description: Runs program
+//
+// ************************************************************
+int main()
+{
+
+    DatabaseManager dbManager;
+
+    // Open the database
+    if (!dbManager.openDatabase("utilityproviders.db"))
+    {
+        return 1; // Exit if the database couldn't be opened
+    }
+
+    // initialize tables in database if not done so already
+    //  dbManager.initTables();
+
+    vector<provider> providers;
+    vector<UtilityService> services;
+
+    LoadData(providers, services);
+    // Initialize customers directly
+    Customer customer1(dbManager, "Alice Johnson", "123 Maple St");
+    Customer customer2(dbManager, "Bob Smith", "456 Oak Ave");
+    Customer customer3(dbManager, "Charlie Brown", "789 Pine Rd");
+
+    std::vector<Customer> customers = {customer1, customer2, customer3};
+
+    Customer *currentCustomer = nullptr; // pointer to logged-in customer
+
+    int choice; // variable to hold user input options
+
+    while (true) // infinite loop to repeat until user log in or exits
+    {
+        cout << "\n--- Utility Billing System ---\n";
+        cout << "1. Login\n";
+        cout << "2. Register\n";
+        cout << "3. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice; // recieve input
+
+        if (choice == 1) // 1: proceed to login
+        {
+            int id;
+            cout << "\nEnter Customer ID: ";                  // prompt for a id of an existing customer
+            cin >> id;                                        // recieve input
+            currentCustomer = Customer::login(customers, id); // use customer login function
+        }
+        else if (choice == 2) // 2: proceed to registration
+        {
+            string name, address;
+            int id = customers.size() + 1; // assign a new id
+            cout << "\nEnter Name: ";      // prompt for name
+            cin.ignore();
+            getline(cin, name);                                                        // recieve input
+            cout << "\nEnter Address: ";                                               // prompt for address
+            getline(cin, address);                                                     // recieve input
+            currentCustomer = Customer::registerAccount(customers, id, name, address); // use customer register function
+        }
+        else if (choice == 3) // 3: exit
+        {
+            cout << "\nExiting...\n";
+            break; // exit loop
+        }
+        else // otherwise: get input again
+        {
+            cout << "\nInvalid choice! Try again.\n";
+        }
+
+        if (currentCustomer) // check if logged in
+        {
+            break; // proceed to main menu after login
+        }
+    }
+
+    if (!currentCustomer) // check if not legged in
+    {
+        return 0; // exit if user didn't log in
+    }
+
+    while (true) // infinite loop to keep displaying user options until they exit
+    {
+        cout << "\n--- Utility Billing System ---\n";
+        cout << "1. Subscribe to a service\n";
+        cout << "2. View bills\n";
+        cout << "3. Make a payment\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice; // take input
+
+        switch (choice)
+        {
+        case 1:
+            currentCustomer->subscribeService();
+            break;
+        case 2:
+            currentCustomer->viewBill();
+            break;
+        case 3:
+            int billID;
+            cout << "Enter Bill ID to pay: ";
+            cin >> billID;
+            currentCustomer->makePayment(billID);
+            break;
+        case 4:
+            cout << "Logging out...\n";
+            currentCustomer = nullptr;
+            break;
+        default:
+            cout << "Invalid choice. Try again.\n";
+        }
+
+        if (!currentCustomer)
+        {
+            break; // Return to login menu
+        }
+    }
+
+    dbManager.closeDatabase();
+
+    return 0;
+}
