@@ -27,6 +27,8 @@ public:
     bool executeQuery(const std::string &query);
     int getLastInsertId();
     void initTables();
+    void resetDatabase();
+    void insertData();
     sqlite3 *getConnection();
     void LoadData(vector<provider> &providers, vector<UtilityService> &services);
 };

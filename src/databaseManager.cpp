@@ -82,9 +82,9 @@ int DatabaseManager::getLastInsertId()
     return static_cast<int>(sqlite3_last_insert_rowid(db));
 }
 
-// Initialize tables in the database
 void DatabaseManager::initTables()
 {
+    // Query to create the Customers table
     const string createCustomers = R"(
         CREATE TABLE IF NOT EXISTS Customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,7 +93,99 @@ void DatabaseManager::initTables()
         );
     )";
 
+    // Query to create the Providers table
+    const string createProviders = R"(
+        CREATE TABLE IF NOT EXISTS providers (
+            providerID INTEGER PRIMARY KEY AUTOINCREMENT,
+            P_Name TEXT NOT NULL
+        );
+    )";
+
+    // Query to create the Services table
+    const string createServices = R"(
+        CREATE TABLE IF NOT EXISTS services (
+            serviceID INTEGER PRIMARY KEY AUTOINCREMENT,
+            S_Name TEXT NOT NULL,
+            rate_per_unit REAL,
+            fixed_charge REAL,
+            providerID INTEGER,
+            FOREIGN KEY(providerID) REFERENCES providers(providerID)
+        );
+    )";
+
+    // Execute the queries to create the tables
     executeQuery(createCustomers);
+    executeQuery(createProviders);
+    executeQuery(createServices);
+}
+
+void DatabaseManager::resetDatabase()
+{
+    // Query to drop the Customers table
+    const string dropCustomers = "DROP TABLE IF EXISTS Customers;";
+
+    // Query to drop the Providers table
+    const string dropProviders = "DROP TABLE IF EXISTS providers;";
+
+    // Query to drop the Services table
+    const string dropServices = "DROP TABLE IF EXISTS services;";
+
+    // Execute the queries to drop the tables
+    executeQuery(dropCustomers);
+    executeQuery(dropProviders);
+    executeQuery(dropServices);
+
+    cout << "All tables dropped successfully!" << endl;
+}
+
+void DatabaseManager::insertData()
+{
+    // Insert data into the providers table
+    const string insertProviders = R"(
+        INSERT INTO providers (P_Name) VALUES
+        ('GasPlus'),
+        ('EcoHydro'),
+        ('FastNet Internet'),
+        ('SmartWater'),
+        ('UrbanEnergy'),
+        ('GreenConnect'),
+        ('PowerGrid Inc.'),
+        ('BlueFlame Utilities'),
+        ('HomeWave Solutions'),
+        ('MetroEnergy');
+    )";
+
+    // Insert data into the services table
+    const string insertServices = R"(
+        INSERT INTO services (S_Name, rate_per_unit, fixed_charge, providerID) VALUES
+        ('Natural Gas', 0.19, 24.0, 1),
+        ('TV', 0.42, 28.0, 1),
+        ('Mobile Phone', 0.11, 35.0, 1),
+        ('Home Phone', 0.06, 20.0, 1),
+        ('Electric', 0.14, 22.0, 1),
+        ('Water', 0.0035, 18.0, 1),
+        ('Sewerage', 0.0025, 15.0, 1),
+        ('Natural Gas', 0.18, 23.0, 2),
+        ('TV', 0.4, 27.0, 2),
+        ('Mobile Phone', 0.105, 33.0, 2),
+        ('Home Phone', 0.055, 18.0, 2),
+        ('Electric', 0.135, 21.0, 2),
+        ('Water', 0.0032, 17.0, 2),
+        ('Sewerage', 0.0022, 14.0, 2),
+        ('Natural Gas', 0.2, 25.0, 3),
+        ('TV', 0.43, 30.0, 3),
+        ('Mobile Phone', 0.12, 36.0, 3),
+        ('Home Phone', 0.058, 21.0, 3),
+        ('Electric', 0.145, 23.0, 3),
+        ('Water', 0.0036, 19.0, 3),
+        ('Sewerage', 0.0024, 16.0, 3);
+    )";
+
+    // Execute the queries to insert data
+    executeQuery(insertProviders);
+    executeQuery(insertServices);
+
+    cout << "Data inserted successfully!" << endl;
 }
 
 // Load data into providers and services
