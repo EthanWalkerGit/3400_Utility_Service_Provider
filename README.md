@@ -15,3 +15,8 @@ To run this program:
 
 3. Execute using:
    ./main
+
+
+To run test.cpp
+
+   g++ test.cpp provider.cpp UtilityService.cpp -lsqlite3 -o test
