@@ -20,3 +20,9 @@ To run this program:
 To run test.cpp
 
    g++ test.cpp provider.cpp UtilityService.cpp -lsqlite3 -o test
+
+
+To run test_main.cpp
+   g++ -std=c++20 -Iinclude -Llib src/test_main.cpp src/customer.cpp src/bill.cpp src/databaseManager.cpp src/UtilityService.cpp src/provider.cpp  -lsqlite3 -o test_main
+
+./test_main
