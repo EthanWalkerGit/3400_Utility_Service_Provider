@@ -7,6 +7,11 @@ extern "C"
 }
 #include <iostream>
 #include <string>
+#include <vector>
+#include "UtilityService.h"
+#include "provider.h"
+
+using namespace std;
 
 class DatabaseManager
 {
@@ -22,6 +27,8 @@ public:
     bool executeQuery(const std::string &query);
     int getLastInsertId();
     void initTables();
+    sqlite3 *getConnection();
+    void LoadData(vector<provider> &providers, vector<UtilityService> &services);
 };
 
 #endif

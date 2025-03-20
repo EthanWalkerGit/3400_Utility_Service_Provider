@@ -4,41 +4,6 @@
 
 using namespace std;
 
-void LoadData(vector<provider> &providers, vector<UtilityService> &services)
-{
-    sqlite3 *db;
-    if (sqlite3_open("utilityproviders.db", &db))
-    {
-        cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
-        return;
-    }
-
-    const char *sql = "SELECT providers.providerID, providers.P_Name, services.serviceID, services.S_Name, services.rate_per_unit, services.fixed_charge FROM providers JOIN services ON providers.providerID = services.providerID;";
-    sqlite3_stmt *stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
-    {
-        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
-        sqlite3_close(db);
-        return;
-    }
-
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        int pid = sqlite3_column_int(stmt, 0);
-        string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        int sid = sqlite3_column_int(stmt, 2);
-        string s_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        double rpu = sqlite3_column_double(stmt, 4);
-        double fc = sqlite3_column_double(stmt, 5);
-        providers.emplace_back(pid, p_name);
-        services.emplace_back(sid, s_name, rpu, fc, pid);
-    }
-
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
-}
-
 // ************************************************************
 //
 //  Function: main
@@ -63,7 +28,7 @@ int main()
     vector<provider> providers;
     vector<UtilityService> services;
 
-    LoadData(providers, services);
+    dbManager.LoadData(providers, services);
     // Initialize customers directly
     Customer customer1(dbManager, "Alice Johnson", "123 Maple St");
     Customer customer2(dbManager, "Bob Smith", "456 Oak Ave");
