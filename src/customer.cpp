@@ -32,12 +32,12 @@ Customer::Customer(DatabaseManager &db, const string &name, const string &addres
 // ************************************************************
 void Customer::subscribeService()
 {
-    int billID = bills.size() + 1; // assign unique ID to new bill based on current # of bills
-    int serviceID = billID;        // replace with actual service id later
-    int providerID = billID;       // replace with actual provider id later
-    double amount = 50.0;          // placeholder amount
-    string dueDate = "2025-04-01"; // placeholder date
-    string status = "default";     // placeholder state
+    int billID = bills.size() * billID + 1; // assign unique ID to new bill based on current # of bills
+    int serviceID = billID;                 // replace with actual service id later
+    int providerID = billID;                // replace with actual provider id later
+    double amount = 50.0;                   // placeholder amount
+    string dueDate = "2025-04-01";          // placeholder date
+    string status = "default";              // placeholder state
 
     // create new bill and store it in bills vector
     bills.push_back(Bill(billID, customerID, serviceID, providerID, amount, dueDate, status));
