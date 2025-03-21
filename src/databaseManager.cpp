@@ -201,12 +201,10 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
 
     if (sqlite3_prepare_v2(db, sql_p, -1, &stmt_p, nullptr) != SQLITE_OK) {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
-        sqlite3_close(db);
         return;
     }
     if (sqlite3_prepare_v2(db, sql_s, -1, &stmt_s, nullptr) != SQLITE_OK) {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
-        sqlite3_close(db);
         return;
     }
 
