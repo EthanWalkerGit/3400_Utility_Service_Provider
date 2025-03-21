@@ -194,28 +194,43 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
 {
     sqlite3 *db = getConnection(); // Get the database connection
 
-    const char *sql = "SELECT providers.providerID, providers.P_Name, services.serviceID, services.S_Name, services.rate_per_unit, services.fixed_charge FROM providers JOIN services ON providers.providerID = services.providerID;";
-    sqlite3_stmt *stmt;
+    const char* sql_p = "SELECT providerID, P_Name FROM providers;";
+    const char* sql_s = "SELECT serviceID, S_Name, rate_per_unit, fixed_charge , providerID FROM services;";
+    sqlite3_stmt* stmt_p;
+    sqlite3_stmt* stmt_s;
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
-    {
+    if (sqlite3_prepare_v2(db, sql_p, -1, &stmt_p, nullptr) != SQLITE_OK) {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
-        return; // No need to close db here, as it is managed by DatabaseManager
+        sqlite3_close(db);
+        return;
+    }
+    if (sqlite3_prepare_v2(db, sql_s, -1, &stmt_s, nullptr) != SQLITE_OK) {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        sqlite3_close(db);
+        return;
     }
 
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        int pid = sqlite3_column_int(stmt, 0);
-        string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        int sid = sqlite3_column_int(stmt, 2);
-        string s_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        double rpu = sqlite3_column_double(stmt, 4);
-        double fc = sqlite3_column_double(stmt, 5);
+    while (sqlite3_step(stmt_p) == SQLITE_ROW) {
+        int pid = sqlite3_column_int(stmt_p, 0);
+        string p_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt_p, 1));
+        
         providers.emplace_back(pid, p_name);
-        services.emplace_back(sid, s_name, rpu, fc, pid);
+    }
+    while(sqlite3_step(stmt_s) == SQLITE_ROW){
+
+        int sid = sqlite3_column_int(stmt_s, 0);
+        string s_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt_s, 1));
+        double rpu = sqlite3_column_double(stmt_s, 2);
+        double fc = sqlite3_column_double(stmt_s, 3);
+        int pid = sqlite3_column_int(stmt_s, 4);
+        services.emplace_back(sid, s_name, rpu,fc,pid);
+
     }
 
-    sqlite3_finalize(stmt); // Finalize the statement
+
+
+    sqlite3_finalize(stmt_p);
+    sqlite3_finalize(stmt_s);
 
     const char *sql2 = "SELECT customer_id, customer_name, address FROM Customers;";
     sqlite3_stmt *stmt2;
