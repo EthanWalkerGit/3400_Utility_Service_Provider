@@ -1,4 +1,6 @@
 #include "customer_menu.h"
+#include "customer.h"
+#include "databaseManager.h"
 
 void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, DatabaseManager &dbManager)
 {
@@ -30,7 +32,7 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
         switch (choice)
         {
         case 1:
-            currentCustomer->subscribeService();
+            currentCustomer->subscribeService(dbManager);
             break;
         case 2:
             currentCustomer->viewBill();
@@ -39,7 +41,7 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             int billID;
             cout << "Enter Bill ID to pay: ";
             cin >> billID;
-            currentCustomer->makePayment(billID);
+            currentCustomer->makePayment(billID, dbManager);
             break;
         case 4:
             cout << "Logging out...\n";

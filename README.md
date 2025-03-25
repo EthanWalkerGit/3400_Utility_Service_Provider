@@ -11,7 +11,7 @@ To run this program:
 1. Navigate to the source directory
 2. Enter this command into your command line:
 
-   g++ -std=c++20 -Iinclude -Llib src/main.cpp src/customer.cpp src/bill.cpp src/databaseManager.cpp -lsqlite3 -o main
+   g++ -std=c++20 -Iinclude -Llib src/main.cpp src/customer.cpp src/bill.cpp src/databaseManager.cpp src/UtilityService.cpp src/provider.cpp src/customer_menu.cpp src/provider_menu.cpp  -lsqlite3 -o main
 
 3. Execute using:
    ./main

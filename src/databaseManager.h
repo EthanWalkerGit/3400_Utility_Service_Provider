@@ -11,6 +11,9 @@ extern "C"
 #include "UtilityService.h"
 #include "provider.h"
 #include "customer.h"
+#include "customer_menu.h"
+
+class Customer;
 
 using namespace std;
 

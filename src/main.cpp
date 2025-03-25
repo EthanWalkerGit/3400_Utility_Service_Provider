@@ -50,7 +50,7 @@ int main()
             getline(cin, name);
             cout << "Enter Address: ";
             getline(cin, address);
-            Customer::registerAccount(customers, id, name, address);
+            Customer::registerAccount(customers, id, name, address, dbManager);
         }
         else if (choice == 4) // Exit
         {

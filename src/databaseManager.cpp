@@ -2,9 +2,10 @@
 #include <iostream>
 #include <vector>
 #include <sqlite3.h>
-#include "provider.h"       // Include your provider header
-#include "UtilityService.h" // Include your UtilityService header
+#include "provider.h"
+#include "UtilityService.h"
 #include "customer.h"
+#include "customer_menu.h"
 
 using std::cerr;
 using std::cout;

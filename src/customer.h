@@ -5,6 +5,9 @@
 #include <vector>
 #include <string>
 #include "bill.h"
+#include "databaseManager.h"
+
+class DatabaseManager;
 
 using namespace std;
 
@@ -51,7 +54,7 @@ public:
     //  Description: Subscribes a customer to a placeholder service.
     //
     // ************************************************************
-    void subscribeService();
+    void subscribeService(DatabaseManager &dbManager);
 
     // ************************************************************
     //
@@ -69,11 +72,11 @@ public:
     //  Description: Allows a customer to pay a bill.
     //
     // ************************************************************
-    void makePayment(int billID);
+    void makePayment(int billID, DatabaseManager &dbManager);
 
     // Login/Register Functions
     static Customer *login(vector<Customer> &customers, int id);
-    static Customer *registerAccount(vector<Customer> &customers, int id, const string &name, const string &address);
+    static Customer *registerAccount(vector<Customer> &customers, int id, const string &name, const string &address, DatabaseManager &dbManager);
 };
 
 #endif
