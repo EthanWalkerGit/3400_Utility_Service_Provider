@@ -12,6 +12,7 @@ extern "C"
 #include "provider.h"
 #include "customer.h"
 #include "customer_menu.h"
+#include "bill.h"
 
 class Customer;
 
@@ -22,6 +23,9 @@ class DatabaseManager
 private:
     sqlite3 *db;
 
+    // Callback function for retrieving bills
+    static int callbackFunction(void *data, int argc, char **argv, char **colNames);
+
 public:
     DatabaseManager();
     ~DatabaseManager();
@@ -30,8 +34,9 @@ public:
     bool openDatabase(const std::string &dbName);
     // closes database connection
     void closeDatabase();
-    // executes SQL query string passed to the function
-    bool executeQuery(const std::string &query);
+    // Overloaded versions of executeQuery
+    bool executeQuery(const string &query);                      // Original version
+    bool executeQuery(const string &query, vector<Bill> &bills); // New version
     int getLastInsertId();
     int getNextBillID();
     void initTables();

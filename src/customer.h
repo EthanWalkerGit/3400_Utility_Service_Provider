@@ -6,6 +6,7 @@
 #include <string>
 #include "bill.h"
 #include "databaseManager.h"
+#include "UtilityService.h"
 
 class DatabaseManager;
 
@@ -67,6 +68,15 @@ public:
 
     // ************************************************************
     //
+    //  Function: addBill
+    //
+    //  Description: Adds a bill to the bills list.
+    //
+    // ************************************************************
+    void addBill(const Bill &bill);
+
+    // ************************************************************
+    //
     //  Function: makePayment
     //
     //  Description: Allows a customer to pay a bill.
@@ -77,6 +87,9 @@ public:
     // Login/Register Functions
     static Customer *login(vector<Customer> &customers, int id);
     static Customer *registerAccount(vector<Customer> &customers, int id, const string &name, const string &address, DatabaseManager &dbManager);
+
+    // load bills function
+    void loadBillsFromDatabase(DatabaseManager &dbManager);
 };
 
 #endif

@@ -1,3 +1,7 @@
+#include <vector>
+#include <map>
+#include <string>
+#include <iostream>
 #include <sstream>
 #include "customer.h"
 
@@ -97,6 +101,18 @@ void Customer::viewBill() const
 
 // ************************************************************
 //
+//  Function: addBill
+//
+//  Description: Adds a bill to the bills list.
+//
+// ************************************************************
+void Customer::addBill(const Bill &bill)
+{
+    bills.push_back(bill);
+}
+
+// ************************************************************
+//
 //  Function: makePayment
 //
 //  Description: Allows a customer to pay a bill. (**NOTE NEED TO HANDLE PAYMENT FAILURE**)
@@ -183,4 +199,29 @@ Customer *Customer::registerAccount(vector<Customer> &customers, int id, const s
         cout << "\nError: Failed to register customer in database.\n";
         return nullptr;
     }
+}
+
+// ************************************************************
+//
+//  Function: loadBillsFromDatabase
+//
+//  Description: Loads all the bills for a customer from the database.
+//
+// ************************************************************
+void Customer::loadBillsFromDatabase(DatabaseManager &dbManager)
+{
+    stringstream query;
+    query << "SELECT BillID, ServiceID, Amount, DueDate, Status FROM bills WHERE CustomerID = " << this->customerID << ";";
+
+    vector<Bill> bills; // Create an empty vector to hold the bills
+
+    // Execute query and fetch results into the vector
+    if (!dbManager.executeQuery(query.str(), bills)) // Pass the bills vector to the executeQuery function
+    {
+        cout << "No bills found for customer " << this->customerID << endl;
+        return;
+    }
+
+    // Populate the customer's bills vector with the fetched bills
+    this->bills = bills;
 }

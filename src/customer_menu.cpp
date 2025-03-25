@@ -17,21 +17,22 @@ void view_services(std::vector<UtilityService> &services)
 
 void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, DatabaseManager &dbManager)
 {
-    int id;
-    Customer *currentCustomer = nullptr;
+    int customerID;
 
     cout << "Enter Customer ID: ";
-    cin >> id;
+    cin >> customerID;
 
-    currentCustomer = Customer::login(customers, id);
+    Customer *customer = Customer::login(customers, customerID);
 
-    if (!currentCustomer)
+    if (!customer)
     {
         cout << "Invalid ID! Returning to main menu.\n";
         return;
     }
 
+    customer->loadBillsFromDatabase(dbManager);
     int choice;
+
     while (true)
     {
         cout << "\n--- Customer Menu ---\n";
@@ -48,16 +49,16 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             // Display the available services for the customer to choose from
             view_services(services); // Assuming you pass the services list here
             // After viewing, allow subscription to a selected service
-            currentCustomer->subscribeToService(dbManager, services);
+            customer->subscribeToService(dbManager, services);
             break;
         case 2:
-            currentCustomer->viewBill();
+            customer->viewBill();
             break;
         case 3:
             int billID;
             cout << "Enter Bill ID to pay: ";
             cin >> billID;
-            currentCustomer->makePayment(billID, dbManager);
+            customer->makePayment(billID, dbManager);
             break;
         case 4:
             cout << "Logging out...\n";

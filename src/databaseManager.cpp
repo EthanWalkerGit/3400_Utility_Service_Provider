@@ -54,7 +54,7 @@ sqlite3 *DatabaseManager::getConnection()
     return db; // Return the database connection
 }
 
-// Execute a SQL query
+// Original executeQuery (unchanged)
 bool DatabaseManager::executeQuery(const string &query)
 {
     if (!db)
@@ -71,11 +71,51 @@ bool DatabaseManager::executeQuery(const string &query)
         sqlite3_free(errMsg);
         return false;
     }
-    else
+
+    cout << "Query executed successfully!" << endl;
+    return true;
+}
+
+// Overloaded executeQuery with bills parameter
+bool DatabaseManager::executeQuery(const string &query, vector<Bill> &bills)
+{
+    if (!db)
     {
-        cout << "Query executed successfully!" << endl;
-        return true;
+        cerr << "Database is not open!" << endl;
+        return false;
     }
+
+    char *errMsg = nullptr;
+    int rc = sqlite3_exec(db, query.c_str(), callbackFunction, &bills, &errMsg); // Pass bills vector
+    if (rc != SQLITE_OK)
+    {
+        cerr << "SQL error: " << errMsg << endl;
+        sqlite3_free(errMsg);
+        return false;
+    }
+
+    cout << "Query executed successfully!" << endl;
+    return true;
+}
+
+// Define the callback function that fills the vector with results
+int DatabaseManager::callbackFunction(void *data, int argc, char **argv, char **azColName)
+{
+    vector<Bill> *bills = static_cast<vector<Bill> *>(data); // Cast to vector<Bill> pointer
+
+    if (argc < 5) // Ensure we have enough columns
+        return 1; // Abort if data is incomplete
+
+    int billID = stoi(argv[0]);
+    int serviceID = stoi(argv[1]);
+    double amount = stod(argv[2]);
+    string dueDate = argv[3] ? argv[3] : "";
+    string status = argv[4] ? argv[4] : "";
+
+    // Assuming Bill constructor: Bill(int billID, int customerID, int serviceID, int providerID, double amount, string dueDate, string status)
+    bills->emplace_back(billID, 0, serviceID, 1, amount, dueDate, status);
+
+    return 0; // Success
 }
 
 // Method to get the last inserted row ID
@@ -197,8 +237,10 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
 
     const char *sql_p = "SELECT providerID, P_Name FROM providers;";
     const char *sql_s = "SELECT serviceID, S_Name, rate_per_unit, fixed_charge , providerID FROM services;";
+    const char *sql_b = "SELECT BillID, CustomerID, ServiceID, Amount, DueDate, Status FROM bills;";
     sqlite3_stmt *stmt_p;
     sqlite3_stmt *stmt_s;
+    sqlite3_stmt *stmt_b;
 
     if (sqlite3_prepare_v2(db, sql_p, -1, &stmt_p, nullptr) != SQLITE_OK)
     {
@@ -208,6 +250,11 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
     if (sqlite3_prepare_v2(db, sql_s, -1, &stmt_s, nullptr) != SQLITE_OK)
     {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    if (sqlite3_prepare_v2(db, sql_b, -1, &stmt_b, nullptr) != SQLITE_OK)
+    {
+        cerr << "Failed to prepare bills statement: " << sqlite3_errmsg(db) << endl;
         return;
     }
 
@@ -228,9 +275,29 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
         int pid = sqlite3_column_int(stmt_s, 4);
         services.emplace_back(sid, s_name, rpu, fc, pid);
     }
+    while (sqlite3_step(stmt_b) == SQLITE_ROW)
+    {
+        int billID = sqlite3_column_int(stmt_b, 0);
+        int customerID = sqlite3_column_int(stmt_b, 1);
+        int serviceID = sqlite3_column_int(stmt_b, 2);
+        double amount = sqlite3_column_double(stmt_b, 3);
+        string dueDate = reinterpret_cast<const char *>(sqlite3_column_text(stmt_b, 4));
+        string status = reinterpret_cast<const char *>(sqlite3_column_text(stmt_b, 5));
+
+        // Add the bill to the appropriate customer
+        for (auto &customer : customers)
+        {
+            if (customer.getCustomerID() == customerID)
+            {
+                customer.addBill(Bill(billID, customerID, serviceID, 1, amount, dueDate, status)); // Replace '1' with correct providerID if needed
+                break;
+            }
+        }
+    }
 
     sqlite3_finalize(stmt_p);
     sqlite3_finalize(stmt_s);
+    sqlite3_finalize(stmt_b);
 
     const char *sql2 = "SELECT customer_id, customer_name, address FROM Customers;";
     sqlite3_stmt *stmt2;
