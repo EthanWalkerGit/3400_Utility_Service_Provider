@@ -1,125 +1,68 @@
-#include "customer.h"
+#include <iostream>
+#include <vector>
+#include "customer_menu.h"
+#include "provider_menu.h"
+#include "databaseManager.h"
 
 using namespace std;
 
-// ************************************************************
-//
-//  Function: main
-//
-//  Description: Runs program
-//
-// ************************************************************
 int main()
 {
     DatabaseManager dbManager;
 
-    // Open the database
     if (!dbManager.openDatabase("utilityproviders.db"))
     {
-        return 1; // Exit if the database couldn't be opened
+        return 1;
     }
 
-    // initialize tables in database if not done so already
-    dbManager.initTables();
+    vector<provider> providers;
+    vector<UtilityService> services;
+    vector<Customer> customers;
 
-    // Initialize customers directly
-    Customer customer1(dbManager, "Alice Johnson", "123 Maple St");
-    Customer customer2(dbManager, "Bob Smith", "456 Oak Ave");
-    Customer customer3(dbManager, "Charlie Brown", "789 Pine Rd");
+    dbManager.LoadData(providers, services, customers);
 
-    std::vector<Customer> customers = {customer1, customer2, customer3};
-
-    Customer *currentCustomer = nullptr; // pointer to logged-in customer
-
-    int choice; // variable to hold user input options
-
-    while (true) // infinite loop to repeat until user log in or exits
+    while (true)
     {
         cout << "\n--- Utility Billing System ---\n";
-        cout << "1. Login\n";
-        cout << "2. Register\n";
-        cout << "3. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice; // recieve input
-
-        if (choice == 1) // 1: proceed to login
-        {
-            int id;
-            cout << "\nEnter Customer ID: ";                  // prompt for a id of an existing customer
-            cin >> id;                                        // recieve input
-            currentCustomer = Customer::login(customers, id); // use customer login function
-        }
-        else if (choice == 2) // 2: proceed to registration
-        {
-            string name, address;
-            int id = customers.size() + 1; // assign a new id
-            cout << "\nEnter Name: ";      // prompt for name
-            cin.ignore();
-            getline(cin, name);                                                        // recieve input
-            cout << "\nEnter Address: ";                                               // prompt for address
-            getline(cin, address);                                                     // recieve input
-            currentCustomer = Customer::registerAccount(customers, id, name, address); // use customer register function
-        }
-        else if (choice == 3) // 3: exit
-        {
-            cout << "\nExiting...\n";
-            break; // exit loop
-        }
-        else // otherwise: get input again
-        {
-            cout << "\nInvalid choice! Try again.\n";
-        }
-
-        if (currentCustomer) // check if logged in
-        {
-            break; // proceed to main menu after login
-        }
-    }
-
-    if (!currentCustomer) // check if not legged in
-    {
-        return 0; // exit if user didn't log in
-    }
-
-    while (true) // infinite loop to keep displaying user options until they exit
-    {
-        cout << "\n--- Utility Billing System ---\n";
-        cout << "1. Subscribe to a service\n";
-        cout << "2. View bills\n";
-        cout << "3. Make a payment\n";
+        cout << "1. Login as Customer\n";
+        cout << "2. Login as Provider\n";
+        cout << "3. Register as Customer\n";
         cout << "4. Exit\n";
         cout << "Enter your choice: ";
-        cin >> choice; // take input
 
-        switch (choice)
+        int choice;
+        cin >> choice;
+
+        if (choice == 1) // Customer Login
         {
-        case 1:
-            currentCustomer->subscribeService();
-            break;
-        case 2:
-            currentCustomer->viewBill();
-            break;
-        case 3:
-            int billID;
-            cout << "Enter Bill ID to pay: ";
-            cin >> billID;
-            currentCustomer->makePayment(billID);
-            break;
-        case 4:
-            cout << "Logging out...\n";
-            currentCustomer = nullptr;
-            break;
-        default:
-            cout << "Invalid choice. Try again.\n";
+            customer_menu(customers, services, dbManager);
         }
-
-        if (!currentCustomer)
+        else if (choice == 2) // Provider Login
         {
-            break; // Return to login menu
+            provider_menu(providers, services, dbManager);
+        }
+        else if (choice == 3) // Register Customer
+        {
+            string name, address;
+            int id = customers.size() + 1;
+            cout << "\nEnter Name: ";
+            cin.ignore();
+            getline(cin, name);
+            cout << "Enter Address: ";
+            getline(cin, address);
+            Customer::registerAccount(customers, id, name, address);
+        }
+        else if (choice == 4) // Exit
+        {
+            cout << "Exiting...\n";
+            break;
+        }
+        else
+        {
+            cout << "Invalid choice! Try again.\n";
         }
     }
 
     dbManager.closeDatabase();
-
     return 0;
 }

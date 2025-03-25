@@ -1,4 +1,4 @@
-#include "DatabaseManager.h"
+#include "databaseManager.h"
 #include <iostream>
 #include <vector>
 #include <sqlite3.h>
@@ -194,38 +194,39 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
 {
     sqlite3 *db = getConnection(); // Get the database connection
 
-    const char* sql_p = "SELECT providerID, P_Name FROM providers;";
-    const char* sql_s = "SELECT serviceID, S_Name, rate_per_unit, fixed_charge , providerID FROM services;";
-    sqlite3_stmt* stmt_p;
-    sqlite3_stmt* stmt_s;
+    const char *sql_p = "SELECT providerID, P_Name FROM providers;";
+    const char *sql_s = "SELECT serviceID, S_Name, rate_per_unit, fixed_charge , providerID FROM services;";
+    sqlite3_stmt *stmt_p;
+    sqlite3_stmt *stmt_s;
 
-    if (sqlite3_prepare_v2(db, sql_p, -1, &stmt_p, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql_p, -1, &stmt_p, nullptr) != SQLITE_OK)
+    {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
         return;
     }
-    if (sqlite3_prepare_v2(db, sql_s, -1, &stmt_s, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql_s, -1, &stmt_s, nullptr) != SQLITE_OK)
+    {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
         return;
     }
 
-    while (sqlite3_step(stmt_p) == SQLITE_ROW) {
+    while (sqlite3_step(stmt_p) == SQLITE_ROW)
+    {
         int pid = sqlite3_column_int(stmt_p, 0);
-        string p_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt_p, 1));
-        
+        string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt_p, 1));
+
         providers.emplace_back(pid, p_name);
     }
-    while(sqlite3_step(stmt_s) == SQLITE_ROW){
+    while (sqlite3_step(stmt_s) == SQLITE_ROW)
+    {
 
         int sid = sqlite3_column_int(stmt_s, 0);
-        string s_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt_s, 1));
+        string s_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt_s, 1));
         double rpu = sqlite3_column_double(stmt_s, 2);
         double fc = sqlite3_column_double(stmt_s, 3);
         int pid = sqlite3_column_int(stmt_s, 4);
-        services.emplace_back(sid, s_name, rpu,fc,pid);
-
+        services.emplace_back(sid, s_name, rpu, fc, pid);
     }
-
-
 
     sqlite3_finalize(stmt_p);
     sqlite3_finalize(stmt_s);

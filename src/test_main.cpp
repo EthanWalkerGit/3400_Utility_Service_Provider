@@ -1,7 +1,7 @@
 #include "customer.h"
 #include "UtilityService.h"
 #include "provider.h"
-#include "DatabaseManager.h"
+#include "databaseManager.h"
 
 using namespace std;
 
