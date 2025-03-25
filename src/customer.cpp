@@ -23,21 +23,6 @@ Customer::Customer(const int &id, const string &name, const string &address)
 //  Description: Subscribes a customer to a placeholder service.
 //
 // ************************************************************
-/*void Customer::subscribeService()
-{
-    int billID = bills.size() * billID + 1; // assign unique ID to new bill based on current # of bills
-    int serviceID = billID;                 // replace with actual service id later
-    int providerID = billID;                // replace with actual provider id later
-    double amount = 50.0;                   // placeholder amount
-    string dueDate = "2025-04-01";          // placeholder date
-    string status = "default";              // placeholder state
-
-    // create new bill and store it in bills vector
-    bills.push_back(Bill(billID, customerID, serviceID, providerID, amount, dueDate, status));
-    cout << "\nService subscribed! New bill generated.\n";
-}*/
-
-/* DATABASE VERSION */
 void Customer::subscribeService(DatabaseManager &dbManager)
 {
     int billID = bills.size() + 1; // Assign unique bill ID
@@ -95,21 +80,6 @@ void Customer::viewBill() const
 //  Description: Allows a customer to pay a bill. (**NOTE NEED TO HANDLE PAYMENT FAILURE**)
 //
 // ************************************************************
-/*void Customer::makePayment(int billID)
-{
-    for (Bill &bill : bills) // loop through all bills in vector
-    {
-        if (bill.getBillID() == billID) // check if the bill id matches that being paid
-        {
-            bill.markPaid(); // use the pay function in bill class to attempt to pay the bill
-            cout << "\nBill " << billID << " has been paid.\n";
-            return;
-        }
-    }
-    cout << "\nBill ID not found.\n"; // no matching bill was found
-}*/
-
-/* DATABASE VERSION */
 void Customer::makePayment(int billID, DatabaseManager &dbManager)
 {
     for (Bill &bill : bills)
@@ -164,22 +134,6 @@ Customer *Customer::login(vector<Customer> &customers, int id)
 //  Description: If the user doesn't exist, they can create a new account
 //
 // ************************************************************
-/*Customer *Customer::registerAccount(vector<Customer> &customers, int id, const string &name, const string &address)
-{
-    // Check if the ID is already taken
-    for (const Customer &customer : customers) // loop through all customers in vector
-    {
-        if (customer.getCustomerID() == id) // check if the customer id matches
-        {
-            cout << "\nCustomer ID already exists! Try logging in.\n";
-            return nullptr; // return refference to no customer
-        }
-    }
-
-    cout << "\nAccount created successfully!\n";
-    return &customers.back(); // return refference to newly added customer at back of vector
-}*/
-/* DATABASE VERSION */
 Customer *Customer::registerAccount(vector<Customer> &customers, int id, const string &name, const string &address, DatabaseManager &dbManager)
 {
     // Check if the ID is already taken
