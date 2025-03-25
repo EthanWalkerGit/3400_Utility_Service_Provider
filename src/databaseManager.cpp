@@ -245,9 +245,35 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
     {
         int id = sqlite3_column_int(stmt2, 0);
         string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 1));
-        string address = reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 1));
+        string address = reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 2));
+        cout << "Loaded customer: ID=" << id << ", Name=" << name << ", Address=" << address << endl; // Debug line
         customers.emplace_back(id, name, address);
     }
 
     sqlite3_finalize(stmt2); // Finalize the statement
+}
+
+int DatabaseManager::getNextBillID()
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT MAX(BillID) FROM bills;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return -1; // Error retrieving Bill ID
+    }
+
+    int nextBillID = 1; // Default if no Bill IDs exist (first BillID)
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int maxBillID = sqlite3_column_int(stmt, 0);
+        if (maxBillID != SQLITE_NULL)
+        {
+            nextBillID = maxBillID + 1;
+        }
+    }
+
+    sqlite3_finalize(stmt); // Finalize the statement
+    return nextBillID;
 }

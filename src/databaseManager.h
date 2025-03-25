@@ -33,6 +33,7 @@ public:
     // executes SQL query string passed to the function
     bool executeQuery(const std::string &query);
     int getLastInsertId();
+    int getNextBillID();
     void initTables();
     void resetDatabase();
     void insertData();

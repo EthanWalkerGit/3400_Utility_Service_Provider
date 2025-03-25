@@ -54,7 +54,7 @@ public:
     //  Description: Subscribes a customer to a placeholder service.
     //
     // ************************************************************
-    void subscribeService(DatabaseManager &dbManager);
+    void subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services);
 
     // ************************************************************
     //

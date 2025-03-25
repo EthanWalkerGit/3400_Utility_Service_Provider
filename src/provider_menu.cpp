@@ -16,14 +16,17 @@ double setFC()
     return fc;
 }
 
-void view_services(vector<UtilityService> services, int pid)
+void view_services(vector<UtilityService> &services, int pid = -1)
 {
-    cout << "\n---Current Services ---\n";
-    for (const auto &s : services)
+    cout << "\n--- Available Services ---\n";
+    for (const auto &service : services)
     {
-        if (s.getPID() == pid)
+        if (pid == -1 || service.getPID() == pid) // If pid is -1, show all services
         {
-            cout << "\nService id:" << s.getSID() << "----Service Name " << s.getName() << "----Rate: " << s.getRate() << "----Fixed Cost: " << s.getFC() << endl;
+            cout << "Service ID: " << service.getSID()
+                 << ", Service Name: " << service.getName()
+                 << ", Rate: $" << service.getRate() << "/unit"
+                 << ", Fixed Cost: $" << service.getFC() << endl;
         }
     }
 }

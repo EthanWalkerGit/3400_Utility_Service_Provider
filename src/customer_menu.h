@@ -12,6 +12,7 @@ class DatabaseManager;
 
 using namespace std;
 
-void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, DatabaseManager &dbManager);
+void customer_menu(std::vector<Customer> &customers, std::vector<UtilityService> &services, DatabaseManager &dbManager);
+void view_services(std::vector<UtilityService> &services);
 
 #endif

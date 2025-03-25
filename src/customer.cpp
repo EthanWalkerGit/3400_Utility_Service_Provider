@@ -23,29 +23,51 @@ Customer::Customer(const int &id, const string &name, const string &address)
 //  Description: Subscribes a customer to a placeholder service.
 //
 // ************************************************************
-void Customer::subscribeService(DatabaseManager &dbManager)
+void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services)
 {
-    int billID = bills.size() + 1; // Assign unique bill ID
-    int serviceID = billID;        // Placeholder (replace later)
-    int providerID = billID;       // Placeholder (replace later)
-    double amount = 50.0;          // Placeholder amount
-    string dueDate = "2025-04-01"; // Placeholder date
-    string status = "Pending";     // Set bill status to pending
+    int serviceID;
+    cout << "Enter the Service ID to subscribe to: ";
+    cin >> serviceID;
 
-    // Insert bill into database
+    // Find the selected service
+    UtilityService *selectedService = nullptr;
+    for (auto &service : services)
+    {
+        if (service.getSID() == serviceID)
+        {
+            selectedService = &service;
+            break;
+        }
+    }
+
+    if (!selectedService)
+    {
+        cout << "Service not found. Returning to the menu.\n";
+        return;
+    }
+
+    // Create a new bill for this service
+    int billID = dbManager.getNextBillID();     // Assuming the database provides the next available bill ID
+    double amount = selectedService->getRate(); // Get rate from the service
+    string dueDate = "2025-04-01";              // Placeholder due date (could be dynamically set)
+    string status = "Pending";                  // Default status
+
+    // Insert the bill into the database
     stringstream query;
-    query << "INSERT INTO bills (BillID, CustomerID, ServiceID, ProviderID, Amount, DueDate, Status) VALUES ("
-          << billID << ", " << customerID << ", " << serviceID << ", " << providerID << ", " << amount << ", '"
+    query << "INSERT INTO bills (BillID, CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
+          << billID << ", " << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
           << dueDate << "', '" << status << "');";
 
-    if (dbManager.executeQuery(query.str())) // Ensure query execution was successful
+    if (dbManager.executeQuery(query.str()))
     {
-        bills.push_back(Bill(billID, customerID, serviceID, providerID, amount, dueDate, status));
-        cout << "\nService subscribed! New bill generated.\n";
+        int providerID = 1; // Replace with an actual provider ID if needed
+        bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status));
+
+        cout << "Successfully subscribed to " << selectedService->getName() << " service. New bill generated.\n";
     }
     else
     {
-        cout << "\nError: Failed to add bill to database.\n";
+        cout << "Error: Failed to create a new bill.\n";
     }
 }
 

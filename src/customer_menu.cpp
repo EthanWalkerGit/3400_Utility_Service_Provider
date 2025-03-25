@@ -1,6 +1,19 @@
 #include "customer_menu.h"
 #include "customer.h"
 #include "databaseManager.h"
+#include "provider_menu.h"
+
+void view_services(std::vector<UtilityService> &services)
+{
+    cout << "\n--- Available Services ---\n";
+    for (const auto &service : services)
+    {
+        cout << "Service ID: " << service.getSID()
+             << " | Name: " << service.getName()
+             << " | Rate: " << service.getRate()
+             << " | Fixed Cost: " << service.getFC() << endl;
+    }
+}
 
 void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, DatabaseManager &dbManager)
 {
@@ -32,7 +45,10 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
         switch (choice)
         {
         case 1:
-            currentCustomer->subscribeService(dbManager);
+            // Display the available services for the customer to choose from
+            view_services(services); // Assuming you pass the services list here
+            // After viewing, allow subscription to a selected service
+            currentCustomer->subscribeToService(dbManager, services);
             break;
         case 2:
             currentCustomer->viewBill();
