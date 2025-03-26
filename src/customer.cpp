@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <ctime> // Required for date/time functions
 #include "customer.h"
 
 // ************************************************************
@@ -52,8 +53,15 @@ void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityServ
 
     // Create a new bill for this service
     double amount = selectedService->getRate(); // Get rate from the service
-    string dueDate = "2025-04-01";              // Placeholder due date (could be dynamically set)
-    string status = "Pending";                  // Default status
+
+    // Get the current date + 30 days as YYYY-MM-DD
+    time_t now = time(nullptr);
+    tm *ltm = localtime(&now);
+    ltm->tm_mday += 30; // Add 30 days to the current date
+    mktime(ltm);        // Normalize the date structure (handles overflow)
+    string dueDate = to_string(ltm->tm_year + 1900) + "-" + (ltm->tm_mon < 9 ? "0" : "") + to_string(ltm->tm_mon + 1) + "-" + (ltm->tm_mday < 10 ? "0" : "") + to_string(ltm->tm_mday);
+
+    string status = "Pending"; // Default status
 
     // Insert the bill into the database WITHOUT specifying billID
     stringstream query;
