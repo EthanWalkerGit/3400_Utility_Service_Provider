@@ -174,24 +174,18 @@ Customer *Customer::login(vector<Customer> &customers, int id)
 // ************************************************************
 Customer *Customer::registerAccount(vector<Customer> &customers, int id, const string &name, const string &address, DatabaseManager &dbManager)
 {
-    // Check if the ID is already taken
-    for (const Customer &customer : customers)
-    {
-        if (customer.getCustomerID() == id)
-        {
-            cout << "\nCustomer ID already exists! Try logging in.\n";
-            return nullptr;
-        }
-    }
-
     // Insert new customer into database
     stringstream query;
-    query << "INSERT INTO customers (CustomerID, Name, Address) VALUES (" << id << ", '" << name << "', '" << address << "');";
+    query << "INSERT INTO Customers (customer_name, address) VALUES ('" << name << "', '" << address << "');";
 
     if (dbManager.executeQuery(query.str())) // Ensure query execution was successful
     {
-        customers.emplace_back(id, name, address);
-        cout << "\nAccount created successfully!\n";
+        // Retrieve the newly inserted customer ID
+        int newID = dbManager.getLastInsertId(); // Use your existing method
+
+        // Add to local customer list
+        customers.emplace_back(newID, name, address);
+        cout << "\nAccount created successfully! Your Customer ID is: " << newID << "\n";
         return &customers.back();
     }
     else
