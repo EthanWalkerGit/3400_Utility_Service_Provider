@@ -1,5 +1,4 @@
 TO DO LIST:
-- Fix customer registration (database insertion)
 - Give different provider distinct names
 - Add time feature where bills are set to overdue if not paid within 30 days
 - Add a searching feature for utilities outside of just viewing

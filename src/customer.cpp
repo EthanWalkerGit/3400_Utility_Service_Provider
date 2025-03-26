@@ -51,23 +51,26 @@ void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityServ
     }
 
     // Create a new bill for this service
-    int billID = dbManager.getNextBillID();     // Assuming the database provides the next available bill ID
     double amount = selectedService->getRate(); // Get rate from the service
     string dueDate = "2025-04-01";              // Placeholder due date (could be dynamically set)
     string status = "Pending";                  // Default status
 
-    // Insert the bill into the database
+    // Insert the bill into the database WITHOUT specifying billID
     stringstream query;
-    query << "INSERT INTO bills (BillID, CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
-          << billID << ", " << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
+    query << "INSERT INTO bills (CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
+          << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
           << dueDate << "', '" << status << "');";
 
     if (dbManager.executeQuery(query.str()))
     {
-        int providerID = 1; // Replace with an actual provider ID if needed
+        // Retrieve the newly inserted bill ID
+        int billID = dbManager.getLastInsertId(); // Fetch last inserted ID from SQLite
+        int providerID = 1;                       // Replace with an actual provider ID if needed
+
+        // Store in the local bill list
         bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status));
 
-        cout << "Successfully subscribed to " << selectedService->getName() << " service. New bill generated.\n";
+        cout << "Successfully subscribed to " << selectedService->getName() << " service. New bill generated (Bill ID: " << billID << ").\n";
     }
     else
     {
