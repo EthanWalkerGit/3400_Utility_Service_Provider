@@ -9,16 +9,42 @@ double setRate()
 }
 double setFC()
 {
-
     double fc;
     cout << "Please set the fixed cost: ";
     cin >> fc;
     return fc;
 }
 
+/*
 void view_services(vector<UtilityService> &services, int pid = -1)
 {
     cout << "\n--- Available Services ---\n";
+    for (const auto &service : services)
+    {
+        if (pid == -1 || service.getPID() == pid) // If pid is -1, show all services
+        {
+            cout << "Service ID: " << service.getSID()
+                 << ", Service Name: " << service.getName()
+                 << ", Rate: $" << service.getRate() << "/unit"
+                 << ", Fixed Cost: $" << service.getFC() << endl;
+        }
+    }
+}*/
+void view_services(vector<UtilityService> &services, vector<provider> &providers, int pid = -1)
+{
+    string provider_name = "All Providers";
+    if (pid != -1) // Find provider name if a specific provider is selected
+    {
+        for (const auto &p : providers)
+        {
+            if (p.get_pid() == pid)
+            {
+                provider_name = p.getName();
+                break;
+            }
+        }
+    }
+    cout << "\n--- " << provider_name << "'s Available Services ---\n";
     for (const auto &service : services)
     {
         if (pid == -1 || service.getPID() == pid) // If pid is -1, show all services
@@ -33,7 +59,6 @@ void view_services(vector<UtilityService> &services, int pid = -1)
 
 void add_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
 {
-
     int opp;
     string servicename;
     double rate;
@@ -197,15 +222,14 @@ void deleteService(vector<UtilityService> &services, vector<provider> &providers
 
 void provider_menu(vector<provider> &providers, vector<UtilityService> &services, DatabaseManager &dbManager)
 {
-
     int pid;
     int exit_loop = 0;
     int count = 0;
     int opp;
+    string provider_name;
     while (true)
     {
-
-        cout << "Enter Password: ";
+        cout << "Enter Provider ID: ";
         cin >> pid;
 
         for (const auto &p : providers)
@@ -213,6 +237,7 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
             if (p.get_pid() == pid)
             {
                 exit_loop = 1;
+                provider_name = p.getName();
                 break;
             }
         }
@@ -228,6 +253,8 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
         count++;
     }
 
+    cout << "\nWelcome back, " << provider_name << "!\n";
+
     do
     {
         cout << "\n--- Service Menu ---\n";
@@ -241,7 +268,7 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
 
         if (opp == 1)
         {
-            view_services(services, pid);
+            view_services(services, providers, pid);
         }
         else if (opp == 2)
         {

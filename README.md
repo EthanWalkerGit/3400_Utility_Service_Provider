@@ -16,6 +16,14 @@ To run this program:
 
 To Access SQLLite Database
    sqlite3 utilityproviders.db
+To View Tables
+   .tables
+To View Table Schema
+   .schema <table>
+To View a Tables Records
+   SELECT * FROM <table>
+Exit SQLLite
+   .exit
 
 To run test.cpp
 
