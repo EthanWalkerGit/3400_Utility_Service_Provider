@@ -15,6 +15,6 @@ class provider;
 using namespace std;
 
 void customer_menu(std::vector<Customer> &customers, std::vector<UtilityService> &services, std::vector<provider> &providers, DatabaseManager &dbManager);
-void view_services(std::vector<UtilityService> &services);
+void view_services(std::vector<UtilityService> &services, int providerID = -1);
 
 #endif

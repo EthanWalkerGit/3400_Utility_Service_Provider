@@ -28,7 +28,8 @@ Customer::Customer(const int &id, const string &name, const string &address)
 //  Description: Subscribes a customer to a placeholder service.
 //
 // ************************************************************
-/*void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services)
+/* original version to diplay all services for all companies
+void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services)
 {
     int serviceID;
     cout << "Enter the Service ID to subscribe to: ";
@@ -85,104 +86,65 @@ Customer::Customer(const int &id, const string &name, const string &address)
         cout << "Error: Failed to create a new bill.\n";
     }
 }*/
-void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services, vector<provider> &providers)
+void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services, vector<provider> &providers, int providerID, int serviceID)
 {
-    while (true)
+    // No need to display the provider list again or ask the user to choose a provider
+    cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n";
+
+    vector<UtilityService *> availableServices;
+    for (auto &service : services)
     {
-        cout << "\n--- Available Providers ---\n";
-        for (size_t i = 0; i < providers.size(); ++i)
+        if (service.getPID() == providerID)
         {
-            cout << i + 1 << ". " << providers[i].getName() << endl;
+            availableServices.push_back(&service);
+            cout << service.getSID() << ". " << service.getName() << " - Rate: $"
+                 << service.getRate() << "/unit, Fixed Cost: $" << service.getFC() << endl;
         }
-        cout << providers.size() + 1 << ". Exit\n";
+    }
 
-        int providerChoice;
-        cout << "Select a provider to view their services (or choose Exit): ";
-        cin >> providerChoice;
+    bool serviceFound = false;
+    UtilityService *selectedService = nullptr;
 
-        if (providerChoice == providers.size() + 1)
+    // Find the service with the entered ID
+    for (auto &service : availableServices)
+    {
+        if (service->getSID() == serviceID)
         {
-            cout << "Exiting subscription process.\n";
-            return;
+            selectedService = service;
+            serviceFound = true;
+            break;
         }
+    }
 
-        if (providerChoice < 1 || providerChoice > static_cast<int>(providers.size()))
-        {
-            cout << "Invalid selection. Please try again.\n";
-            continue;
-        }
+    if (!serviceFound)
+    {
+        cout << "Invalid Service ID. Please try again.\n";
+        return;
+    }
 
-        int providerID = providers[providerChoice - 1].get_pid();
-        cout << "\n--- " << providers[providerChoice - 1].getName() << "'s Available Services ---\n";
+    // Generate a new bill
+    double amount = selectedService->getRate();
+    time_t now = time(nullptr);
+    tm *ltm = localtime(&now);
+    ltm->tm_mday += 30;
+    mktime(ltm);
+    string dueDate = to_string(ltm->tm_year + 1900) + "-" + (ltm->tm_mon < 9 ? "0" : "") + to_string(ltm->tm_mon + 1) + "-" + (ltm->tm_mday < 10 ? "0" : "") + to_string(ltm->tm_mday);
+    string status = "Pending";
 
-        vector<UtilityService *> availableServices;
-        for (auto &service : services)
-        {
-            if (service.getPID() == providerID)
-            {
-                availableServices.push_back(&service);
-                cout << service.getSID() << ". " << service.getName() << " - Rate: $"
-                     << service.getRate() << "/unit, Fixed Cost: $" << service.getFC() << endl;
-            }
-        }
+    stringstream query;
+    query << "INSERT INTO bills (CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
+          << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
+          << dueDate << "', '" << status << "');";
 
-        if (availableServices.empty())
-        {
-            cout << "No services available for this provider. Returning to provider selection.\n";
-            continue;
-        }
-
-        cout << availableServices.size() + 1 << ". Go Back\n";
-        cout << availableServices.size() + 2 << ". Exit\n";
-
-        int serviceChoice;
-        cout << "Select a service to subscribe to (or choose Go Back / Exit): ";
-        cin >> serviceChoice;
-
-        if (serviceChoice == availableServices.size() + 1)
-        {
-            continue; // Go back to provider selection
-        }
-        if (serviceChoice == availableServices.size() + 2)
-        {
-            cout << "Exiting subscription process.\n";
-            return;
-        }
-
-        if (serviceChoice < 1 || serviceChoice > static_cast<int>(availableServices.size()))
-        {
-            cout << "Invalid selection. Please try again.\n";
-            continue;
-        }
-
-        UtilityService *selectedService = availableServices[serviceChoice - 1];
-
-        // Generate a new bill
-        double amount = selectedService->getRate();
-        time_t now = time(nullptr);
-        tm *ltm = localtime(&now);
-        ltm->tm_mday += 30;
-        mktime(ltm);
-        string dueDate = to_string(ltm->tm_year + 1900) + "-" + (ltm->tm_mon < 9 ? "0" : "") + to_string(ltm->tm_mon + 1) + "-" + (ltm->tm_mday < 10 ? "0" : "") + to_string(ltm->tm_mday);
-        string status = "Pending";
-
-        stringstream query;
-        query << "INSERT INTO bills (CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
-              << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
-              << dueDate << "', '" << status << "');";
-
-        if (dbManager.executeQuery(query.str()))
-        {
-            int billID = dbManager.getLastInsertId();
-            bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status));
-            cout << "Successfully subscribed to " << selectedService->getName() << " service! New bill (Bill ID: " << billID << ") created.\n";
-        }
-        else
-        {
-            cout << "Error: Failed to create a new bill.\n";
-        }
-
-        return; // Exit after successful subscription
+    if (dbManager.executeQuery(query.str()))
+    {
+        int billID = dbManager.getLastInsertId();
+        bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status));
+        cout << "Successfully subscribed to " << selectedService->getName() << " service! New bill (Bill ID: " << billID << ") created.\n";
+    }
+    else
+    {
+        cout << "Error: Failed to create a new bill.\n";
     }
 }
 
