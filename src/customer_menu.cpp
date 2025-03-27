@@ -15,7 +15,7 @@ void view_services(std::vector<UtilityService> &services)
     }
 }
 
-void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, DatabaseManager &dbManager)
+void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, vector<provider> &providers, DatabaseManager &dbManager)
 {
     int customerID;
 
@@ -49,7 +49,7 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             // Display the available services for the customer to choose from
             view_services(services); // Assuming you pass the services list here
             // After viewing, allow subscription to a selected service
-            customer->subscribeToService(dbManager, services);
+            customer->subscribeToService(dbManager, services, providers);
             break;
         case 2:
             customer->viewBill();

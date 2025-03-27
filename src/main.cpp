@@ -35,7 +35,7 @@ int main()
 
         if (choice == 1) // Customer Login
         {
-            customer_menu(customers, services, dbManager);
+            customer_menu(customers, services, providers, dbManager);
         }
         else if (choice == 2) // Provider Login
         {

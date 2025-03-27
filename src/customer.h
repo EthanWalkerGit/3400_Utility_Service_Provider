@@ -7,6 +7,7 @@
 #include "bill.h"
 #include "databaseManager.h"
 #include "UtilityService.h"
+#include "provider.h"
 
 class DatabaseManager;
 
@@ -55,7 +56,7 @@ public:
     //  Description: Subscribes a customer to a placeholder service.
     //
     // ************************************************************
-    void subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services);
+    void subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services, vector<provider> &providers);
 
     // ************************************************************
     //
