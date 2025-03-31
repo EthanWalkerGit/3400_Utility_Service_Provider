@@ -13,9 +13,10 @@ public:
 
 	int provider_id;
 	string provider_name;
+	double sales;
 	list<UtilityService> services_offered;
 
-	provider(int id, string name);
+	provider(int id, string name, double s);
 
 	string getName() const;
 
