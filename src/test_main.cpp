@@ -5,6 +5,18 @@
 
 using namespace std;
 
+void print_services(string servicename, vector<UtilityService> &services)
+{
+    cout << "id --- Service Name --- Rate --- Fixed charge" << endl;
+    for (const auto &s : services)
+    {
+        if (s.getName() == servicename)
+        {
+            cout << s.getSID() << " ----- " << s.getName() << " ----- " << s.getRate() << " ----- " << s.getFC() << endl;
+        }
+    }
+};
+
 // ************************************************************
 //
 //  Function: main
@@ -14,7 +26,6 @@ using namespace std;
 // ************************************************************
 int main()
 {
-
     DatabaseManager dbManager;
 
     // Open the database
@@ -58,10 +69,10 @@ int main()
             int id = customers.size() + 1; // assign a new id
             cout << "\nEnter Name: ";      // prompt for name
             cin.ignore();
-            getline(cin, name);                                                        // recieve input
-            cout << "\nEnter Address: ";                                               // prompt for address
-            getline(cin, address);                                                     // recieve input
-            currentCustomer = Customer::registerAccount(customers, id, name, address); // use customer register function
+            getline(cin, name);                                                                   // recieve input
+            cout << "\nEnter Address: ";                                                          // prompt for address
+            getline(cin, address);                                                                // recieve input
+            currentCustomer = Customer::registerAccount(customers, id, name, address, dbManager); // use customer register function
         }
         else if (choice == 3) // 3: exit
         {
@@ -81,34 +92,100 @@ int main()
 
     if (!currentCustomer) // check if not legged in
     {
+        dbManager.closeDatabase();
         return 0; // exit if user didn't log in
     }
 
     while (true) // infinite loop to keep displaying user options until they exit
     {
         cout << "\n--- Utility Billing System ---\n";
-        cout << "1. Subscribe to a service\n";
-        cout << "2. View bills\n";
-        cout << "3. Make a payment\n";
-        cout << "4. Exit\n";
+        cout << "1. View services\n";
+        cout << "2. Subscribe to a service\n";
+        cout << "3. View bills\n";
+        cout << "4. Make a payment\n";
+        cout << "5. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice; // take input
 
         switch (choice)
         {
         case 1:
-            currentCustomer->subscribeService();
-            break;
+        {
+            int opp;
+            cout << "\n---Select a Service Category---\n";
+            cout << "1. Natural Gas\n";
+            cout << "2. Internet Service\n";
+            cout << "3. Hydro\n";
+            cout << "Enter Option: ";
+            cin >> opp;
+
+            if (opp == 1)
+            {
+                print_services("Natural Gas", services);
+            }
+            else if (opp == 2)
+            {
+                opp = 0;
+                cout << "\n1. TV\n";
+                cout << "2. Mobile Phone\n";
+                cout << "3. Home Phone\n";
+                cout << "Enter Option: ";
+
+                cin >> opp;
+                if (opp == 1)
+                {
+                    print_services("TV", services);
+                }
+                else if (opp == 2)
+                {
+                    print_services("Mobile Phone", services);
+                }
+                else if (opp == 3)
+                {
+                    print_services("Home Phone", services);
+                }
+            }
+            else if (opp == 3)
+            {
+                opp = 0;
+                cout << "\n1. Electric\n";
+                cout << "2. Water\n";
+                cout << "3. Sewerage\n";
+                cout << "Enter Option: ";
+
+                cin >> opp;
+                if (opp == 1)
+                {
+                    print_services("Electric", services);
+                }
+                else if (opp == 2)
+                {
+                    print_services("Water", services);
+                }
+                else if (opp == 3)
+                {
+                    print_services("Sewerage", services);
+                }
+            }
+        }
+        break;
+
         case 2:
-            currentCustomer->viewBill();
+            // currentCustomer->subscribeToService();
             break;
         case 3:
+            currentCustomer->viewBill();
+            break;
+        case 4:
+        {
             int billID;
             cout << "Enter Bill ID to pay: ";
             cin >> billID;
-            currentCustomer->makePayment(billID);
-            break;
-        case 4:
+            // currentCustomer->makePayment(billID);
+            cout << billID;
+        }
+        break;
+        case 5:
             cout << "Logging out...\n";
             currentCustomer = nullptr;
             break;
@@ -123,6 +200,5 @@ int main()
     }
 
     dbManager.closeDatabase();
-
     return 0;
 }
