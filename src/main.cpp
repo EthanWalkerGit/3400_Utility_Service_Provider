@@ -27,7 +27,8 @@ int main()
         cout << "1. Login as Customer\n";
         cout << "2. Login as Provider\n";
         cout << "3. Register as Customer\n";
-        cout << "4. Exit\n";
+        cout << "4. Register as Provider\n";
+        cout << "5. Exit\n";
         cout << "Enter your choice: ";
 
         int choice;
@@ -52,7 +53,11 @@ int main()
             getline(cin, address);
             Customer::registerAccount(customers, id, name, address, dbManager);
         }
-        else if (choice == 4) // Exit
+        else if (choice == 4) //Register Provider
+        {
+            add_provider(providers, dbManager);
+        }
+        else if (choice == 5) // Exit
         {
             cout << "Exiting...\n";
             break;
