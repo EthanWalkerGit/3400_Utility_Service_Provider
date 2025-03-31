@@ -3,7 +3,7 @@
 #include "databaseManager.h"
 #include "provider_menu.h"
 
-void view_services(std::vector<UtilityService> &services, int providerID)
+void viewservices(std::vector<UtilityService> &services, int providerID)
 {
     bool found = false;
 
@@ -83,7 +83,7 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             int serviceID;
 
             cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n";
-            view_services(services, providerID); // Display available services
+            viewservices(services, providerID); // Display available services
 
             while (true)
             {

@@ -53,7 +53,7 @@ int main()
             getline(cin, address);
             Customer::registerAccount(customers, id, name, address, dbManager);
         }
-        else if (choice == 4) //Register Provider
+        else if (choice == 4) // Register Provider
         {
             add_provider(providers, dbManager);
         }
