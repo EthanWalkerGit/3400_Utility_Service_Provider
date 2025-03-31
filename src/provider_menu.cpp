@@ -276,6 +276,6 @@ void add_provider(vector<provider> &providers, DatabaseManager &dbManager)
     const string query = query_ss.str();
     dbManager.executeQuery(query);
     int pid = (providers.back().get_pid()) + 1;
-    providers.emplace_back(pid, providername);
+    providers.emplace_back(pid, providername, 0);
     cout << "Your provider login key is " << pid << endl;
 }
