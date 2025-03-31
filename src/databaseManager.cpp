@@ -139,7 +139,8 @@ void DatabaseManager::initTables()
     const string createProviders = R"(
         CREATE TABLE IF NOT EXISTS providers (
             providerID INTEGER PRIMARY KEY AUTOINCREMENT,
-            P_Name TEXT NOT NULL
+            P_Name TEXT NOT NULL,
+            Sales REAL DEFAULT 0.00
         );
     )";
 
@@ -235,7 +236,7 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
 {
     sqlite3 *db = getConnection(); // Get the database connection
 
-    const char *sql_p = "SELECT providerID, P_Name FROM providers;";
+    const char *sql_p = "SELECT providerID, P_Name , Sales FROM providers;";
     const char *sql_s = "SELECT serviceID, S_Name, rate_per_unit, fixed_charge , providerID FROM services;";
     const char *sql_b = "SELECT BillID, CustomerID, ServiceID, Amount, DueDate, Status FROM bills;";
     sqlite3_stmt *stmt_p;
@@ -262,8 +263,8 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
     {
         int pid = sqlite3_column_int(stmt_p, 0);
         string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt_p, 1));
-
-        providers.emplace_back(pid, p_name);
+        double sales = sqlite3_column_double(stmt_s, 2);
+        providers.emplace_back(pid, p_name , sales);
     }
     while (sqlite3_step(stmt_s) == SQLITE_ROW)
     {
