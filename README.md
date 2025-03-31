@@ -14,13 +14,22 @@ To run this program:
 3. Execute using:
    ./main
 
-To Access SQLLite Database
+### To Access SQLLite Database
+
 sqlite3 utilityproviders.db
-To View Tables
+
+#### To View Tables
+
 .tables
-To View Table Schema
+
+#### To View Table Schema
+
 .schema <table>
-To View a Tables Records
+
+#### To View a Tables Records
+
 SELECT \* FROM <table>
-Exit SQLLite
+
+#### Exit SQLLite
+
 .exit
