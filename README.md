@@ -17,10 +17,10 @@ To run this program:
 To Access SQLLite Database
 sqlite3 utilityproviders.db
 To View Tables
-.tables
+   .tables
 To View Table Schema
-.schema <table>
+   .schema <table>
 To View a Tables Records
-SELECT \* FROM <table>
+   SELECT * FROM <table>
 Exit SQLLite
-.exit
+   .exit

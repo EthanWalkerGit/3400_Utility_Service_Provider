@@ -9,7 +9,6 @@ double setRate()
 }
 double setFC()
 {
-
     double fc;
     cout << "Please set the fixed cost: ";
     cin >> fc;
