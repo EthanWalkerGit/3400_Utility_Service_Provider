@@ -17,14 +17,20 @@ double setFC()
 
 void view_services(vector<UtilityService> &services, int pid)
 {
+    int count =0;
     cout << "\n---Current Services ---\n";
     for (const auto &s : services)
     {
         if (s.getPID() == pid)
         {
             cout << "\nService id:" << s.getSID() << "----Service Name " << s.getName() << "----Rate: " << s.getRate() << "----Fixed Cost: " << s.getFC() << endl;
+            count++;
         }
     }
+    if (count == 0){
+        cout << "No services\n";
+    }
+
 }
 
 void add_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
@@ -34,11 +40,12 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
     string servicename;
     double rate;
     double fc;
-
+    while(true){
     cout << "\n---Select a Service Category---\n";
     cout << "1. Natural Gas\n";
     cout << "2. Internet Service\n";
     cout << "3. Hydro\n";
+    cout << "4. Go Back\n";
     cout << "Enter Option: ";
     cin >> opp;
 
@@ -54,6 +61,7 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
         cout << "\n1. TV\n";
         cout << "2. Mobile Phone\n";
         cout << "3. Home Phone\n";
+        cout << "4. Go Back\n";
         cout << "Enter Option: ";
 
         cin >> opp;
@@ -76,6 +84,10 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             rate = setRate();
             fc = setFC();
         }
+        else if (opp == 4){
+            continue;;  
+        }
+        
     }
 
     else if (opp == 3)
@@ -84,6 +96,7 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
         cout << "\n1. Electric\n";
         cout << "2. Water\n";
         cout << "3. Sewerage\n";
+        cout << "4. Go Back\n";
         cout << "Enter Option: ";
 
         cin >> opp;
@@ -106,7 +119,14 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             rate = setRate();
             fc = setFC();
         }
+        else if (opp == 4){
+            continue;;  
+        }
     }
+    else if (opp == 4){
+        return;  
+    }
+}    
 
     stringstream query_ss;
     query_ss << "INSERT INTO services (S_Name, rate_per_unit, fixed_charge, providerID) VALUES (" << "'" << servicename << "'" << "," << rate << "," << fc << "," << pid << ");";
@@ -116,6 +136,7 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
     services.emplace_back(sid, servicename, rate, fc, pid);
 }
 
+
 void edit_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
 {
     int sid;
@@ -124,11 +145,12 @@ void edit_service(vector<UtilityService> &services, vector<provider> &providers,
     int check = 0;
     while (true)
     {
-        cout << "Enter ServiceID to set new rate per unit and fixed cost: ";
+        cout << "Enter ServiceID to set new rate per unit and fixed cost(or 0 to go back): ";
         cin >> sid;
-
+        if(sid == 0){return;}
         for (const auto &s : services)
         {
+            
             if (s.getPID() == pid && s.getSID() == sid)
             {
                 check = 1;
