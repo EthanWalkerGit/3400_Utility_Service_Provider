@@ -45,6 +45,20 @@ string Bill::getStatus() const
     return status; // retrives bill status
 }
 
+int Bill::getCustomerID() const
+{
+    return customerID;
+}
+
+int Bill::getServiceID() const
+{
+    return serviceID;
+}
+
+int Bill::getProviderID() const
+{
+    return providerID;
+}
 // ************************************************************
 //
 //  Function: markPaid

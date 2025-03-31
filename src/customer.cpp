@@ -5,6 +5,9 @@
 #include <sstream>
 #include <ctime> // Required for date/time functions
 #include "customer.h"
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 // ************************************************************
 //
@@ -280,15 +283,58 @@ void Customer::loadBillsFromDatabase(DatabaseManager &dbManager)
     stringstream query;
     query << "SELECT BillID, ServiceID, Amount, DueDate, Status FROM bills WHERE CustomerID = " << this->customerID << ";";
 
-    vector<Bill> bills; // Create an empty vector to hold the bills
+    vector<Bill> bills;
 
-    // Execute query and fetch results into the vector
-    if (!dbManager.executeQuery(query.str(), bills)) // Pass the bills vector to the executeQuery function
+    if (!dbManager.executeQuery(query.str(), bills))
     {
         cout << "No bills found for customer " << this->customerID << endl;
         return;
     }
 
-    // Populate the customer's bills vector with the fetched bills
+    // Get current date (today at midnight)
+    time_t now = time(0);
+    tm currentDate = *localtime(&now);
+    currentDate.tm_hour = 0;
+    currentDate.tm_min = 0;
+    currentDate.tm_sec = 0;
+    time_t currentTime = mktime(&currentDate);
+
+    for (auto &bill : bills)
+    {
+        // Skip if already paid
+        if (bill.getStatus() == "paid")
+        {
+            continue;
+        }
+
+        // Parse the due date
+        tm dueTm = {};
+        istringstream dateStream(bill.getDueDate());
+        dateStream >> get_time(&dueTm, "%Y-%m-%d");
+        time_t dueTime = mktime(&dueTm);
+
+        // Compare dates
+        if (dueTime < currentTime)
+        {
+            // Create a new bill with updated status
+            Bill overdueBill(
+                bill.getBillID(),
+                this->customerID,
+                bill.getServiceID(),
+                bill.getProviderID(),
+                bill.getAmount(),
+                bill.getDueDate(),
+                "Overdue");
+
+            // Replace the bill in the vector
+            bill = overdueBill;
+
+            // Update database
+            stringstream updateQuery;
+            updateQuery << "UPDATE bills SET Status = 'Overdue' WHERE BillID = " << bill.getBillID() << ";";
+            dbManager.executeQuery(updateQuery.str());
+        }
+    }
+
     this->bills = bills;
 }

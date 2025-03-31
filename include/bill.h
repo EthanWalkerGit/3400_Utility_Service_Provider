@@ -38,6 +38,9 @@ public:
     double getAmount() const;
     string getDueDate() const;
     string getStatus() const;
+    int getCustomerID() const;
+    int getServiceID() const;
+    int getProviderID() const;
 
     // ************************************************************
     //
