@@ -267,7 +267,6 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
     }
     while (sqlite3_step(stmt_s) == SQLITE_ROW)
     {
-
         int sid = sqlite3_column_int(stmt_s, 0);
         string s_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt_s, 1));
         double rpu = sqlite3_column_double(stmt_s, 2);
