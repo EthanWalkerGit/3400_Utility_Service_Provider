@@ -122,13 +122,16 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             continue; // ask for input again
         }
 
+        if (opp == 4)
+        {
+            return; // exit the function if "Go Back" is chosen
+        }
+
         if (opp == 1) // natural gas category has no subcategories
         {
             servicename = "Natural Gas";
-            rate = setRate();
-            fc = setFC();
         }
-        else if (opp == 2) // internet has 4 subcategpories to choose from
+        else if (opp == 2) // internet has 4 subcategories to choose from
         {
             cout << "\n1. TV\n";
             cout << "2. Mobile Phone\n";
@@ -146,30 +149,22 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
                 continue; // ask for input again
             }
 
-            if (opp == 1) // if-else block for differnt internet subcategory options
-            {
-                servicename = "TV";
-                rate = setRate();
-                fc = setFC();
-            }
-            else if (opp == 2)
-            {
-                servicename = "Mobile Phone";
-                rate = setRate();
-                fc = setFC();
-            }
-            else if (opp == 3)
-            {
-                servicename = "Home Phone";
-                rate = setRate();
-                fc = setFC();
-            }
-            else if (opp == 4)
+            if (opp == 4)
             {
                 continue; // go back to the main menu
             }
+            else if (opp == 1)
+                servicename = "TV";
+            else if (opp == 2)
+                servicename = "Mobile Phone";
+            else if (opp == 3)
+                servicename = "Home Phone";
+            else
+            {
+                cout << "Invalid choice. Please select a valid option.\n";
+                continue; // ask for input again if invalid choice is made
+            }
         }
-
         else if (opp == 3) // hydro has 3 subcategories
         {
             cout << "\n1. Electric\n";
@@ -188,32 +183,21 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
                 continue; // ask for input again
             }
 
-            if (opp == 1) // if-else block for differnt hydro subcategory options
-            {
-                servicename = "Electric";
-                rate = setRate();
-                fc = setFC();
-            }
-            else if (opp == 2)
-            {
-                servicename = "Water";
-                rate = setRate();
-                fc = setFC();
-            }
-            else if (opp == 3)
-            {
-                servicename = "Sewerage";
-                rate = setRate();
-                fc = setFC();
-            }
-            else if (opp == 4)
+            if (opp == 4)
             {
                 continue; // go back to the main menu
             }
-        }
-        else if (opp == 4)
-        {
-            return; // exit the function if "Go Back" is chosen
+            else if (opp == 1)
+                servicename = "Electric";
+            else if (opp == 2)
+                servicename = "Water";
+            else if (opp == 3)
+                servicename = "Sewerage";
+            else
+            {
+                cout << "Invalid choice. Please select a valid option.\n";
+                continue; // ask for input again if invalid choice is made
+            }
         }
         else
         {
@@ -221,15 +205,20 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             continue; // ask for input again if invalid choice is made
         }
 
+        rate = setRate();
+        fc = setFC();
+
         stringstream query_ss; // query var
         query_ss << "INSERT INTO services (S_Name, rate_per_unit, fixed_charge, providerID) VALUES ('"
                  << servicename << "', " << rate << ", " << fc << ", " << pid << ");"; // query to insert new service
         const string query = query_ss.str();
         dbManager.executeQuery(query); // execute query using db function
 
-        int sid = (services.back().getSID()) + 1;               // get next service ID
-        services.emplace_back(sid, servicename, rate, fc, pid); // update local service conatiner
-        break;                                                  // break out of the loop after adding the service
+        int sid = (services.empty()) ? 1 : (services.back().getSID()) + 1; // get next service ID
+        services.emplace_back(sid, servicename, rate, fc, pid);            // update local service container
+
+        cout << "Service added successfully!\n";
+        return; // exit function after adding service
     }
 }
 
