@@ -15,6 +15,7 @@ double setFC()
     return fc;
 }
 
+/*
 void view_services(vector<UtilityService> &services, int pid)
 {
     int count =0;
@@ -30,103 +31,133 @@ void view_services(vector<UtilityService> &services, int pid)
     if (count == 0){
         cout << "No services\n";
     }
+}*/
+void view_services(vector<UtilityService> &services, vector<provider> &providers, int pid = -1)
+{
+    string provider_name = "All Providers";
 
+    if (pid != -1) // Find provider name if a specific provider is selected
+    {
+        for (const auto &p : providers)
+        {
+            if (p.get_pid() == pid)
+            {
+                provider_name = p.getName();
+                break;
+            }
+        }
+    }
+    cout << "\n--- " << provider_name << "'s Available Services ---\n";
+    for (const auto &service : services)
+    {
+        if (pid == -1 || service.getPID() == pid) // Show all or filtered services
+        {
+            cout << "Service ID: " << service.getSID()
+                 << " | Name: " << service.getName()
+                 << " | Rate: $" << service.getRate() << "/unit"
+                 << " | Fixed Cost: $" << service.getFC() << endl;
+        }
+    }
 }
 
 void add_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
 {
-
     int opp;
     string servicename;
     double rate;
     double fc;
-    while(true){
-    cout << "\n---Select a Service Category---\n";
-    cout << "1. Natural Gas\n";
-    cout << "2. Internet Service\n";
-    cout << "3. Hydro\n";
-    cout << "4. Go Back\n";
-    cout << "Enter Option: ";
-    cin >> opp;
-
-    if (opp == 1)
+    while (true)
     {
-        servicename = "Natural Gas";
-        rate = setRate();
-        fc = setFC();
-    }
-    else if (opp == 2)
-    {
-        opp = 0;
-        cout << "\n1. TV\n";
-        cout << "2. Mobile Phone\n";
-        cout << "3. Home Phone\n";
+        cout << "\n---Select a Service Category---\n";
+        cout << "1. Natural Gas\n";
+        cout << "2. Internet Service\n";
+        cout << "3. Hydro\n";
         cout << "4. Go Back\n";
         cout << "Enter Option: ";
-
         cin >> opp;
+
         if (opp == 1)
         {
-            servicename = "TV";
+            servicename = "Natural Gas";
             rate = setRate();
             fc = setFC();
         }
         else if (opp == 2)
         {
-            servicename = "Mobile Phone";
-            rate = setRate();
-            fc = setFC();
+            opp = 0;
+            cout << "\n1. TV\n";
+            cout << "2. Mobile Phone\n";
+            cout << "3. Home Phone\n";
+            cout << "4. Go Back\n";
+            cout << "Enter Option: ";
+
+            cin >> opp;
+            if (opp == 1)
+            {
+                servicename = "TV";
+                rate = setRate();
+                fc = setFC();
+            }
+            else if (opp == 2)
+            {
+                servicename = "Mobile Phone";
+                rate = setRate();
+                fc = setFC();
+            }
+
+            else if (opp == 3)
+            {
+                servicename = "Home Phone";
+                rate = setRate();
+                fc = setFC();
+            }
+            else if (opp == 4)
+            {
+                continue;
+                ;
+            }
         }
 
         else if (opp == 3)
         {
-            servicename = "Home Phone";
-            rate = setRate();
-            fc = setFC();
-        }
-        else if (opp == 4){
-            continue;;  
-        }
-        
-    }
+            opp = 0;
+            cout << "\n1. Electric\n";
+            cout << "2. Water\n";
+            cout << "3. Sewerage\n";
+            cout << "4. Go Back\n";
+            cout << "Enter Option: ";
 
-    else if (opp == 3)
-    {
-        opp = 0;
-        cout << "\n1. Electric\n";
-        cout << "2. Water\n";
-        cout << "3. Sewerage\n";
-        cout << "4. Go Back\n";
-        cout << "Enter Option: ";
+            cin >> opp;
+            if (opp == 1)
+            {
+                servicename = "Electric";
+                rate = setRate();
+                fc = setFC();
+            }
+            else if (opp == 2)
+            {
+                servicename = "Water";
+                rate = setRate();
+                fc = setFC();
+            }
 
-        cin >> opp;
-        if (opp == 1)
-        {
-            servicename = "Electric";
-            rate = setRate();
-            fc = setFC();
+            else if (opp == 3)
+            {
+                servicename = "Sewerage";
+                rate = setRate();
+                fc = setFC();
+            }
+            else if (opp == 4)
+            {
+                continue;
+                ;
+            }
         }
-        else if (opp == 2)
+        else if (opp == 4)
         {
-            servicename = "Water";
-            rate = setRate();
-            fc = setFC();
-        }
-
-        else if (opp == 3)
-        {
-            servicename = "Sewerage";
-            rate = setRate();
-            fc = setFC();
-        }
-        else if (opp == 4){
-            continue;;  
+            return;
         }
     }
-    else if (opp == 4){
-        return;  
-    }
-}    
 
     stringstream query_ss;
     query_ss << "INSERT INTO services (S_Name, rate_per_unit, fixed_charge, providerID) VALUES (" << "'" << servicename << "'" << "," << rate << "," << fc << "," << pid << ");";
@@ -135,7 +166,6 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
     int sid = (services.back().getSID()) + 1;
     services.emplace_back(sid, servicename, rate, fc, pid);
 }
-
 
 void edit_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
 {
@@ -147,10 +177,13 @@ void edit_service(vector<UtilityService> &services, vector<provider> &providers,
     {
         cout << "Enter ServiceID to set new rate per unit and fixed cost(or 0 to go back): ";
         cin >> sid;
-        if(sid == 0){return;}
+        if (sid == 0)
+        {
+            return;
+        }
         for (const auto &s : services)
         {
-            
+
             if (s.getPID() == pid && s.getSID() == sid)
             {
                 check = 1;
@@ -215,14 +248,12 @@ void deleteService(vector<UtilityService> &services, vector<provider> &providers
 
 void provider_menu(vector<provider> &providers, vector<UtilityService> &services, DatabaseManager &dbManager)
 {
-
     int pid;
     int exit_loop;
     int count = 0;
     int opp;
     while (true)
     {
-
         cout << "Enter Password: ";
         cin >> pid;
 
@@ -259,7 +290,7 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
 
         if (opp == 1)
         {
-            view_services(services, pid);
+            view_services(services, providers, pid);
         }
         else if (opp == 2)
         {
