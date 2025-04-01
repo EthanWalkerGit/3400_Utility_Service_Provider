@@ -194,32 +194,6 @@ void Customer::addBill(const Bill &bill)
 //  Description: Allows a customer to pay a bill. (**NOTE NEED TO HANDLE PAYMENT FAILURE**)
 //
 // ************************************************************
-/*old
-void Customer::makePayment(int billID, DatabaseManager &dbManager)
-{
-    for (Bill &bill : bills)
-    {
-        if (bill.getBillID() == billID) // Check if bill exists
-        {
-            bill.markPaid(); // Update the bill in memory
-
-            // Update the bill status in the database
-            stringstream query;
-            query << "UPDATE bills SET Status = 'Paid' WHERE BillID = " << billID << ";";
-
-            if (dbManager.executeQuery(query.str()))
-            {
-                cout << "\nBill " << billID << " has been paid successfully.\n";
-            }
-            else
-            {
-                cout << "\nError: Failed to update bill status in database.\n";
-            }
-            return;
-        }
-    }
-    cout << "\nError: Bill ID not found.\n";
-}*/
 void Customer::makePayment(int billID, DatabaseManager &dbManager)
 {
     for (Bill &bill : bills)
