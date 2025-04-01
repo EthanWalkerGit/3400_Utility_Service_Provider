@@ -33,6 +33,14 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
     cout << "Enter Customer ID: ";
     cin >> customerID;
 
+    if (cin.fail()) // Check for invalid input
+    {
+        cin.clear();                                         // Clear the error state
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+        cout << "Invalid input! Please enter a valid Customer ID.\n";
+        return; // Return to the main menu
+    }
+
     Customer *customer = Customer::login(customers, customerID);
     if (!customer)
     {
@@ -51,7 +59,16 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
         cout << "3. Make a payment\n";
         cout << "4. Logout\n";
         cout << "Enter your choice: ";
+
         cin >> choice;
+
+        if (cin.fail()) // Check for invalid input
+        {
+            cin.clear();                                         // Clear the error state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input! Please enter a number.\n";
+            continue; // Ask for input again
+        }
 
         switch (choice)
         {
@@ -66,6 +83,14 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             cout << providers.size() + 1 << ". Exit\n";
             cout << "Select a provider (or choose Exit to leave): ";
             cin >> providerChoice;
+
+            if (cin.fail()) // Check for invalid input
+            {
+                cin.clear();                                         // Clear the error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+                cout << "Invalid input! Please enter a valid number.\n";
+                continue; // Ask for input again
+            }
 
             if (providerChoice == providers.size() + 1)
             {
@@ -89,6 +114,14 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             {
                 cout << "Enter the Service ID to subscribe to (0 to go back): ";
                 cin >> serviceID;
+
+                if (cin.fail()) // Check for invalid input
+                {
+                    cin.clear();                                         // Clear the error state
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+                    cout << "Invalid input! Please enter a valid number.\n";
+                    continue; // Ask for input again
+                }
 
                 if (serviceID == 0) // Go back to providers list
                 {
@@ -126,6 +159,15 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
             int billID;
             cout << "Enter Bill ID to pay: ";
             cin >> billID;
+
+            if (cin.fail()) // Check for invalid input
+            {
+                cin.clear();                                         // Clear the error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+                cout << "Invalid input! Please enter a valid Bill ID.\n";
+                continue; // Ask for input again
+            }
+
             customer->makePayment(billID, dbManager);
             break;
         case 4:

@@ -68,6 +68,7 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
     string servicename;
     double rate;
     double fc;
+
     while (true)
     {
         cout << "\n---Select a Service Category---\n";
@@ -76,7 +77,16 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
         cout << "3. Hydro\n";
         cout << "4. Go Back\n";
         cout << "Enter Option: ";
+
         cin >> opp;
+
+        if (cin.fail()) // Check for invalid input
+        {
+            cin.clear();                                         // Clear the error state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input! Please enter a valid number.\n";
+            continue; // Ask for input again
+        }
 
         if (opp == 1)
         {
@@ -86,7 +96,6 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
         }
         else if (opp == 2)
         {
-            opp = 0;
             cout << "\n1. TV\n";
             cout << "2. Mobile Phone\n";
             cout << "3. Home Phone\n";
@@ -94,6 +103,15 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             cout << "Enter Option: ";
 
             cin >> opp;
+
+            if (cin.fail()) // Check for invalid input
+            {
+                cin.clear();                                         // Clear the error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+                cout << "Invalid input! Please enter a valid number.\n";
+                continue; // Ask for input again
+            }
+
             if (opp == 1)
             {
                 servicename = "TV";
@@ -106,7 +124,6 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
                 rate = setRate();
                 fc = setFC();
             }
-
             else if (opp == 3)
             {
                 servicename = "Home Phone";
@@ -115,14 +132,12 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             }
             else if (opp == 4)
             {
-                continue;
-                ;
+                continue; // Go back to the main menu
             }
         }
 
         else if (opp == 3)
         {
-            opp = 0;
             cout << "\n1. Electric\n";
             cout << "2. Water\n";
             cout << "3. Sewerage\n";
@@ -130,6 +145,15 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             cout << "Enter Option: ";
 
             cin >> opp;
+
+            if (cin.fail()) // Check for invalid input
+            {
+                cin.clear();                                         // Clear the error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+                cout << "Invalid input! Please enter a valid number.\n";
+                continue; // Ask for input again
+            }
+
             if (opp == 1)
             {
                 servicename = "Electric";
@@ -142,7 +166,6 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
                 rate = setRate();
                 fc = setFC();
             }
-
             else if (opp == 3)
             {
                 servicename = "Sewerage";
@@ -151,22 +174,30 @@ void add_service(vector<UtilityService> &services, vector<provider> &providers, 
             }
             else if (opp == 4)
             {
-                continue;
-                ;
+                continue; // Go back to the main menu
             }
         }
         else if (opp == 4)
         {
-            return;
+            return; // Exit the function if "Go Back" is chosen
         }
-    }
+        else
+        {
+            cout << "Invalid choice. Please select a valid option.\n";
+            continue; // Ask for input again if invalid choice is made
+        }
 
-    stringstream query_ss;
-    query_ss << "INSERT INTO services (S_Name, rate_per_unit, fixed_charge, providerID) VALUES (" << "'" << servicename << "'" << "," << rate << "," << fc << "," << pid << ");";
-    const string query = query_ss.str();
-    dbManager.executeQuery(query);
-    int sid = (services.back().getSID()) + 1;
-    services.emplace_back(sid, servicename, rate, fc, pid);
+        // If valid option is selected, proceed to insert the service into the database
+        stringstream query_ss;
+        query_ss << "INSERT INTO services (S_Name, rate_per_unit, fixed_charge, providerID) VALUES ('"
+                 << servicename << "', " << rate << ", " << fc << ", " << pid << ");";
+        const string query = query_ss.str();
+        dbManager.executeQuery(query);
+
+        int sid = (services.back().getSID()) + 1; // Get next service ID
+        services.emplace_back(sid, servicename, rate, fc, pid);
+        break; // Break out of the loop after adding the service
+    }
 }
 
 void edit_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
@@ -261,6 +292,14 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
         cout << "Enter Password: ";
         cin >> pid;
 
+        if (cin.fail()) // Check for invalid input
+        {
+            cin.clear();                                         // Clear the error state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input! Please enter a valid number.\n";
+            continue; // Ask for input again
+        }
+
         for (const auto &p : providers)
         {
             if (p.get_pid() == pid)
@@ -270,15 +309,16 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
                 break;
             }
         }
+
         if (exit_loop == 1)
         {
             break;
         }
         if (count == 3)
         {
-            return;
+            return; // Exit after 3 failed attempts
         }
-        cout << "try again\n";
+        cout << "Try again\n";
         count++;
     }
 
@@ -296,34 +336,37 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
         cout << "Enter your choice: ";
         cin >> opp;
 
-        if (opp == 1)
+        if (cin.fail()) // Check for invalid input
         {
+            cin.clear();                                         // Clear the error state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input! Please enter a valid number.\n";
+            continue; // Ask for input again
+        }
+
+        switch (opp)
+        {
+        case 1:
             view_services(services, providers, pid);
-        }
-        else if (opp == 2)
-        {
+            break;
+        case 2:
             add_service(services, providers, pid, dbManager);
-        }
-        else if (opp == 3)
-        {
+            break;
+        case 3:
             edit_service(services, providers, pid, dbManager);
-        }
-        else if (opp == 4)
-        {
+            break;
+        case 4:
             deleteService(services, providers, pid, dbManager);
-        }
-        else if (opp == 5)
-        {
+            break;
+        case 5:
             view_sales(providers, pid, dbManager); // Call view_sales
-        }
-        else if (opp == 6)
-        {
+            break;
+        case 6:
             cout << "Exiting menu..." << endl;
-        }
-        else
-        {
+            break;
+        default:
             cout << "Enter a valid choice\n";
-            continue;
+            continue; // Continue to ask for valid input if an invalid option is entered
         }
 
     } while (opp != 6);

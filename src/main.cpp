@@ -34,6 +34,14 @@ int main()
         int choice;
         cin >> choice;
 
+        if (cin.fail()) // If the user enters invalid input (non-integer)
+        {
+            cin.clear();                                         // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input! Please enter a number.\n";
+            continue; // Skip the rest of the loop and prompt for input again
+        }
+
         if (choice == 1) // Customer Login
         {
             customer_menu(customers, services, providers, dbManager);
