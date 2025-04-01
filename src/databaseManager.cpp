@@ -298,6 +298,7 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
         string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt_p, 1));
         double sales = sqlite3_column_double(stmt_s, 2);
         providers.emplace_back(pid, p_name, sales);
+        cout << "Loaded provider: ID=" << pid << ", Name=" << p_name << ", Sales=" << sales << endl; // Debug line
     }
     while (sqlite3_step(stmt_s) == SQLITE_ROW)
     {
@@ -307,6 +308,7 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
         double fc = sqlite3_column_double(stmt_s, 3);
         int pid = sqlite3_column_int(stmt_s, 4);
         services.emplace_back(sid, s_name, rpu, fc, pid);
+        cout << "Loaded service: ID=" << sid << ", Name=" << s_name << ", Rate=" << rpu << ", Fixed Charge=" << fc << ", ProviderID=" << pid << endl; // Debug line
     }
     while (sqlite3_step(stmt_b) == SQLITE_ROW)
     {
