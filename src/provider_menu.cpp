@@ -252,6 +252,8 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
     int exit_loop;
     int count = 0;
     int opp;
+    string provider_name;
+
     while (true)
     {
         cout << "Enter Password: ";
@@ -262,6 +264,7 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
             if (p.get_pid() == pid)
             {
                 exit_loop = 1;
+                provider_name = p.getName(); // Restore provider name retrieval
                 break;
             }
         }
@@ -276,6 +279,8 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
         cout << "try again\n";
         count++;
     }
+
+    cout << "\nWelcome back, " << provider_name << "!\n"; // Restore welcome message
 
     do
     {
@@ -319,7 +324,6 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
 
 void add_provider(vector<provider> &providers, DatabaseManager &dbManager)
 {
-
     string providername;
     cout << "\nEnter Company Name: ";
     cin.ignore();
