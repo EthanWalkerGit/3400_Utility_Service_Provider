@@ -1,4 +1,4 @@
-#include "bill.h"
+#include "bill.h" // include header file
 
 // ************************************************************
 //
@@ -20,50 +20,45 @@ Bill::Bill(int id, int custID, int servID, int provID, double amt, const string 
 
 // ************************************************************
 //
-//  Function: get functions
+//  Function: Getters
 //
-//  Description: returns different bill attribute values
+//  Description: functions that retrive a specefic attribute of a bill
 //
 // ************************************************************
 int Bill::getBillID() const
 {
     return billID; // retrieves id
 }
-
 double Bill::getAmount() const
 {
     return amount; // retrives current amount on bill
 }
-
 string Bill::getDueDate() const
 {
     return dueDate; // retrives bills due date
 }
-
 string Bill::getStatus() const
 {
     return status; // retrives bill status
 }
-
 int Bill::getCustomerID() const
 {
-    return customerID;
+    return customerID; // retives customer id
 }
-
 int Bill::getServiceID() const
 {
-    return serviceID;
+    return serviceID; // retrives service id
 }
-
 int Bill::getProviderID() const
 {
-    return providerID;
+    return providerID; // retrives provider id
 }
+
 // ************************************************************
 //
 //  Function: markPaid
 //
-//  Description: Marks the bill as paid.
+//  Description: marks the bill as paid
 //
 // ************************************************************
 void Bill::markPaid()

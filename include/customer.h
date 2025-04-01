@@ -1,59 +1,59 @@
-#ifndef CUSTOMER_H
-#define CUSTOMER_H
+#ifndef CUSTOMER_H // header guard
+#define CUSTOMER_H // prevent multiple inclusions
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include "bill.h"
-#include "databaseManager.h"
-#include "UtilityService.h"
-#include "provider.h"
+#include <iostream>          // for i/o
+#include <vector>            // for using vector container
+#include <string>            // for using string
+#include "bill.h"            // bill class
+#include "databaseManager.h" // database management class
+#include "UtilityService.h"  // utility service class
+#include "provider.h"        // provider class
 
-class DatabaseManager;
+class DatabaseManager; // forward declaration of DatabaseManager
 
-using namespace std;
+using namespace std; // use standard namespace
 
 // ************************************************************
 //
 //  Class: Customer
 //
-//  Description: Represents a customer subscribing to utilities.
+//  Description: represents a customer subscribing to utilities
 //
 // ************************************************************
 class Customer
 {
 private:
-    int customerID;
-    string name;
-    string address;
-    vector<Bill> bills; // Stores the customer's bills
+    int customerID;     // customer ID
+    string name;        // customer name
+    string address;     // customer address
+    vector<Bill> bills; // list of bills
 
 public:
     // ************************************************************
     //
     //  Constructor: Customer
     //
-    //  Description: Creates a new customer object.
+    //  Description: creates a new customer object
     //
     // ************************************************************
     Customer(const int &id, const string &name, const string &address);
 
     // ************************************************************
     //
-    //  Function: getter functions
+    //  Function: Getters
     //
-    //  Description: Returns customer attributes
+    //  Description: returns customer attributes
     //
     // ************************************************************
-    int getCustomerID() const { return customerID; }
-    string getName() const { return name; }
-    string getAddress() const { return address; }
+    int getCustomerID() const { return customerID; } // get customer ID
+    string getName() const { return name; }          // get name
+    string getAddress() const { return address; }    // get address
 
     // ************************************************************
     //
     //  Function: subscribeService
     //
-    //  Description: Subscribes a customer to a placeholder service.
+    //  Description: subscribes a customer to a service
     //
     // ************************************************************
     void subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services, vector<provider> &providers, int providerID, int serviceID);
@@ -62,7 +62,7 @@ public:
     //
     //  Function: viewBill
     //
-    //  Description: Allows a user to view their bill status.
+    //  Description: allows a user to view their bill
     //
     // ************************************************************
     void viewBill() const;
@@ -71,7 +71,7 @@ public:
     //
     //  Function: addBill
     //
-    //  Description: Adds a bill to the bills list.
+    //  Description: adds a bill to the bills list
     //
     // ************************************************************
     void addBill(const Bill &bill);
@@ -80,17 +80,37 @@ public:
     //
     //  Function: makePayment
     //
-    //  Description: Allows a customer to pay a bill.
+    //  Description: allows a customer to pay a bill
     //
     // ************************************************************
     void makePayment(int billID, DatabaseManager &dbManager);
 
-    // Login/Register Functions
+    // ************************************************************
+    //
+    //  Function: login
+    //
+    //  Description: allows user to login to system
+    //
+    // ************************************************************
     static Customer *login(vector<Customer> &customers, int id);
+
+    // ************************************************************
+    //
+    //  Function: registerAccount
+    //
+    //  Description: allows user to register into system
+    //
+    // ************************************************************
     static Customer *registerAccount(vector<Customer> &customers, int id, const string &name, const string &address, DatabaseManager &dbManager);
 
-    // load bills function
+    // ************************************************************
+    //
+    //  Function: loadBillsFromDatabase
+    //
+    //  Description: loads the bills from the database to be created/updated/viewed
+    //
+    // ************************************************************
     void loadBillsFromDatabase(DatabaseManager &dbManager);
 };
 
-#endif
+#endif // end of header guard

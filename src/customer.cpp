@@ -1,153 +1,93 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <ctime> // Required for date/time functions
-#include "customer.h"
-#include <ctime>
-#include <iomanip>
-#include <sstream>
+#include "customer.h" // include header
+
+#include <vector>   // for vector conatiner
+#include <map>      // for map container
+#include <string>   // string manipulation
+#include <iostream> // for i/o
+#include <sstream>  // string stream operations
+#include <ctime>    // date/time functions
+#include <iomanip>  // output formatting
 
 // ************************************************************
 //
 //  Constructor: Customer
 //
-//  Description: Creates a new customer object.
+//  Description: creates a new customer object
 //
 // ************************************************************
-
 Customer::Customer(const int &id, const string &name, const string &address)
 {
     this->name = name;       // each customer has a name
     this->address = address; // each customer has an address
-    this->customerID = id;
+    this->customerID = id;   // each customer has an id
 }
 
 // ************************************************************
 //
 //  Function: subscribeService
 //
-//  Description: Subscribes a customer to a placeholder service.
+//  Description: subscribes a customer to a service
 //
 // ************************************************************
-/* original version to diplay all services for all companies
-void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services)
-{
-    int serviceID;
-    cout << "Enter the Service ID to subscribe to: ";
-    cin >> serviceID;
-
-    // Find the selected service
-    UtilityService *selectedService = nullptr;
-    for (auto &service : services)
-    {
-        if (service.getSID() == serviceID)
-        {
-            selectedService = &service;
-            break;
-        }
-    }
-
-    if (!selectedService)
-    {
-        cout << "Service not found. Returning to the menu.\n";
-        return;
-    }
-
-    // Create a new bill for this service
-    double amount = selectedService->getRate(); // Get rate from the service
-
-    // Get the current date + 30 days as YYYY-MM-DD
-    time_t now = time(nullptr);
-    tm *ltm = localtime(&now);
-    ltm->tm_mday += 30; // Add 30 days to the current date
-    mktime(ltm);        // Normalize the date structure (handles overflow)
-    string dueDate = to_string(ltm->tm_year + 1900) + "-" + (ltm->tm_mon < 9 ? "0" : "") + to_string(ltm->tm_mon + 1) + "-" + (ltm->tm_mday < 10 ? "0" : "") + to_string(ltm->tm_mday);
-
-    string status = "Pending"; // Default status
-
-    // Insert the bill into the database WITHOUT specifying billID
-    stringstream query;
-    query << "INSERT INTO bills (CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
-          << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
-          << dueDate << "', '" << status << "');";
-
-    if (dbManager.executeQuery(query.str()))
-    {
-        // Retrieve the newly inserted bill ID
-        int billID = dbManager.getLastInsertId(); // Fetch last inserted ID from SQLite
-        int providerID = 1;                       // Replace with an actual provider ID if needed
-
-        // Store in the local bill list
-        bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status));
-
-        cout << "Successfully subscribed to " << selectedService->getName() << " service. New bill generated (Bill ID: " << billID << ").\n";
-    }
-    else
-    {
-        cout << "Error: Failed to create a new bill.\n";
-    }
-}*/
 void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityService> &services, vector<provider> &providers, int providerID, int serviceID)
 {
-    // No need to display the provider list again or ask the user to choose a provider
-    cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n";
+    cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n"; // provider name header
 
-    vector<UtilityService *> availableServices;
-    for (auto &service : services)
+    vector<UtilityService *> availableServices; // vector to hold services
+    for (auto &service : services)              // iterate over services
     {
-        if (service.getPID() == providerID)
+        if (service.getPID() == providerID) // check if the provider id matches
         {
-            availableServices.push_back(&service);
-            cout << service.getSID() << ". " << service.getName() << " - Rate: $"
+            availableServices.push_back(&service);                                // add service to list
+            cout << service.getSID() << ". " << service.getName() << " - Rate: $" // display service details
                  << service.getRate() << "/unit, Fixed Cost: $" << service.getFC() << endl;
         }
     }
 
-    bool serviceFound = false;
-    UtilityService *selectedService = nullptr;
+    bool serviceFound = false;                 // flag to mark if a service is found
+    UtilityService *selectedService = nullptr; // pointer for a service
 
-    // Find the service with the entered ID
-    for (auto &service : availableServices)
+    for (auto &service : availableServices) // iterate over availible services found
     {
-        if (service->getSID() == serviceID)
+        if (service->getSID() == serviceID) // find the service with the entered ID
         {
-            selectedService = service;
-            serviceFound = true;
-            break;
+            selectedService = service; // mark the service found
+            serviceFound = true;       // mark flag as found
+            break;                     // exit loop
         }
     }
 
-    if (!serviceFound)
+    if (!serviceFound) // if the service was not found amongst the availible ones
     {
-        cout << "Invalid Service ID. Please try again.\n";
+        cout << "Invalid Service ID. Please try again.\n"; // print error message
         return;
     }
 
-    // Generate a new bill
-    double amount = selectedService->getRate();
-    time_t now = time(nullptr);
-    tm *ltm = localtime(&now);
-    ltm->tm_mday += 30;
-    mktime(ltm);
-    string dueDate = to_string(ltm->tm_year + 1900) + "-" + (ltm->tm_mon < 9 ? "0" : "") + to_string(ltm->tm_mon + 1) + "-" + (ltm->tm_mday < 10 ? "0" : "") + to_string(ltm->tm_mday);
-    string status = "Pending";
+    double amount = selectedService->getRate(); // get rate of selected service
+    time_t now = time(nullptr);                 // get current time in seconds
+    tm *ltm = localtime(&now);                  // convert current time to local time
+    ltm->tm_mday += 30;                         // add 30 days to the current day to set due date
+    mktime(ltm);                                // normalize the time structure (adjust for month/year overflow)
 
-    stringstream query;
+    string dueDate = to_string(ltm->tm_year + 1900) + "-" + (ltm->tm_mon < 9 ? "0" : "") + to_string(ltm->tm_mon + 1) + "-" + (ltm->tm_mday < 10 ? "0" : "") + to_string(ltm->tm_mday); // format due date as "YYYY-MM-DD"
+
+    string status = "Pending"; // set initial status to "Pending" before it is paid
+
+    stringstream query; // variable to hold query
     query << "INSERT INTO bills (CustomerID, ServiceID, Amount, DueDate, Status) VALUES ("
           << this->customerID << ", " << selectedService->getSID() << ", " << amount << ", '"
-          << dueDate << "', '" << status << "');";
+          << dueDate << "', '" << status << "');"; // query to insert a new bill
 
-    if (dbManager.executeQuery(query.str()))
+    if (dbManager.executeQuery(query.str())) // call execute query function in dbManager class
     {
-        int billID = dbManager.getLastInsertId();
-        bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status));
-        cout << "Successfully subscribed to " << selectedService->getName() << " service! New bill (Bill ID: " << billID << ") created.\n";
+        int billID = dbManager.getLastInsertId();                                                                        // retrive from the db the last bill id to determine the bill id for the new bill
+        bills.push_back(Bill(billID, this->customerID, selectedService->getSID(), providerID, amount, dueDate, status)); // add new bill to vector
+
+        cout << "Successfully subscribed to " << selectedService->getName() << " service! New bill (Bill ID: " << billID << ") created.\n"; // success message
     }
     else
     {
-        cout << "Error: Failed to create a new bill.\n";
+        cout << "Error: Failed to create a new bill.\n"; // query failed message
     }
 }
 
@@ -155,7 +95,7 @@ void Customer::subscribeToService(DatabaseManager &dbManager, vector<UtilityServ
 //
 //  Function: viewBill
 //
-//  Description: Allows a user to view their bill status.
+//  Description: allows a user to view their bill status
 //
 // ************************************************************
 void Customer::viewBill() const
@@ -184,55 +124,53 @@ void Customer::viewBill() const
 // ************************************************************
 void Customer::addBill(const Bill &bill)
 {
-    bills.push_back(bill);
+    bills.push_back(bill); // add a new bill to bills conatiner
 }
 
 // ************************************************************
 //
 //  Function: makePayment
 //
-//  Description: Allows a customer to pay a bill. (**NOTE NEED TO HANDLE PAYMENT FAILURE**)
+//  Description: allows a customer to pay a bill
 //
 // ************************************************************
 void Customer::makePayment(int billID, DatabaseManager &dbManager)
 {
-    for (Bill &bill : bills)
+    for (Bill &bill : bills) // iterate over bills
     {
-        if (bill.getBillID() == billID) // Check if bill exists
+        if (bill.getBillID() == billID) // check if bill exists
         {
-            double amount = bill.getAmount();
-            int providerID = bill.getProviderID();
+            double amount = bill.getAmount();      // get bills value
+            int providerID = bill.getProviderID(); // get proivder id associated with bill
 
-            bill.markPaid(); // Update the bill in memory
+            bill.markPaid(); // update the bill status
 
-            // Update the bill status in the database
-            stringstream updateBillQuery;
-            updateBillQuery << "UPDATE bills SET Status = 'Paid' WHERE BillID = " << billID << ";";
+            stringstream updateBillQuery;                                                           // query var
+            updateBillQuery << "UPDATE bills SET Status = 'Paid' WHERE BillID = " << billID << ";"; // query to update bill status
 
-            if (dbManager.executeQuery(updateBillQuery.str()))
+            if (dbManager.executeQuery(updateBillQuery.str())) // call execute query
             {
-                // Update provider's sales
-                stringstream updateSalesQuery;
+                stringstream updateSalesQuery; // query var
                 updateSalesQuery << "UPDATE providers SET Sales = Sales + " << amount
-                                 << " WHERE providerID = " << providerID << ";";
+                                 << " WHERE providerID = " << providerID << ";"; // query to update the provider sales since a bill is paid
 
-                if (dbManager.executeQuery(updateSalesQuery.str()))
+                if (dbManager.executeQuery(updateSalesQuery.str())) // check if successful
                 {
-                    cout << "\nBill " << billID << " has been paid successfully. Provider sales updated.\n";
+                    cout << "\nBill " << billID << " has been paid successfully. Provider sales updated.\n"; // success message
                 }
                 else
                 {
-                    cout << "\nError: Failed to update provider sales.\n";
+                    cout << "\nError: Failed to update provider sales.\n"; // update failed message
                 }
             }
-            else
+            else // databse update failed
             {
-                cout << "\nError: Failed to update bill status in database.\n";
+                cout << "\nError: Failed to update bill status in database.\n"; // update failed message
             }
             return;
         }
     }
-    cout << "\nError: Bill ID not found.\n";
+    cout << "\nError: Bill ID not found.\n"; // bill not found error message
 }
 
 // ************************************************************
@@ -248,12 +186,12 @@ Customer *Customer::login(vector<Customer> &customers, int id)
     {
         if (customer.getCustomerID() == id) // check if the customer id matches
         {
-            cout << "\nLogin successful! Welcome back, " << customer.getName() << ".\n";
-            return &customer; // return refference to customer
+            cout << "\nLogin successful! Welcome back, " << customer.getName() << ".\n"; // print out customer name
+            return &customer;                                                            // return refference to customer
         }
     }
-    cout << "\nCustomer ID not found. Please register.\n";
-    return nullptr; // return refference to no customer
+    cout << "\nCustomer ID not found. Please register.\n"; // error message
+    return nullptr;                                        // return refference to no customer
 }
 
 // ************************************************************
@@ -265,23 +203,20 @@ Customer *Customer::login(vector<Customer> &customers, int id)
 // ************************************************************
 Customer *Customer::registerAccount(vector<Customer> &customers, int id, const string &name, const string &address, DatabaseManager &dbManager)
 {
-    // Insert new customer into database
-    stringstream query;
-    query << "INSERT INTO Customers (customer_name, address) VALUES ('" << name << "', '" << address << "');";
+    stringstream query;                                                                                        // query var
+    query << "INSERT INTO Customers (customer_name, address) VALUES ('" << name << "', '" << address << "');"; // insert new customer into database query
 
-    if (dbManager.executeQuery(query.str())) // Ensure query execution was successful
+    if (dbManager.executeQuery(query.str())) // call execute query
     {
-        // Retrieve the newly inserted customer ID
-        int newID = dbManager.getLastInsertId(); // Use your existing method
+        int newID = dbManager.getLastInsertId(); // get new customer id from db
 
-        // Add to local customer list
-        customers.emplace_back(newID, name, address);
-        cout << "\nAccount created successfully! Your Customer ID is: " << newID << "\n";
+        customers.emplace_back(newID, name, address);                                     // add new customer to customer conatiner
+        cout << "\nAccount created successfully! Your Customer ID is: " << newID << "\n"; // success message
         return &customers.back();
     }
     else
     {
-        cout << "\nError: Failed to register customer in database.\n";
+        cout << "\nError: Failed to register customer in database.\n"; // failed to register message
         return nullptr;
     }
 }
@@ -295,43 +230,38 @@ Customer *Customer::registerAccount(vector<Customer> &customers, int id, const s
 // ************************************************************
 void Customer::loadBillsFromDatabase(DatabaseManager &dbManager)
 {
-    stringstream query;
-    query << "SELECT BillID, ServiceID, Amount, DueDate, Status FROM bills WHERE CustomerID = " << this->customerID << ";";
+    stringstream query;                                                                                                     // query var
+    query << "SELECT BillID, ServiceID, Amount, DueDate, Status FROM bills WHERE CustomerID = " << this->customerID << ";"; // query to get bills
 
-    vector<Bill> bills;
+    vector<Bill> bills; // vector conatiner to hold bills
 
-    if (!dbManager.executeQuery(query.str(), bills))
+    if (!dbManager.executeQuery(query.str(), bills)) // call execute query and check if it fails
     {
-        cout << "No bills found for customer " << this->customerID << endl;
+        cout << "No bills found for customer " << this->customerID << endl; // error message for query failing
         return;
     }
 
-    // Get current date (today at midnight)
-    time_t now = time(0);
-    tm currentDate = *localtime(&now);
-    currentDate.tm_hour = 0;
-    currentDate.tm_min = 0;
-    currentDate.tm_sec = 0;
-    time_t currentTime = mktime(&currentDate);
+    time_t now = time(0);                      // get current time in seconds since epoch
+    tm currentDate = *localtime(&now);         // convert current time to local time structure
+    currentDate.tm_hour = 0;                   // set hour to 0 (midnight)
+    currentDate.tm_min = 0;                    // set minute to 0
+    currentDate.tm_sec = 0;                    // set second to 0
+    time_t currentTime = mktime(&currentDate); // convert modified tm struct back to time_t (midnight time)
 
-    for (auto &bill : bills)
+    for (auto &bill : bills) // iterate over bills
     {
-        // Skip if already paid
-        if (bill.getStatus() == "paid")
+        if (bill.getStatus() == "paid") // skip if paid
         {
             continue;
         }
 
-        // Parse the due date
-        tm dueTm = {};
-        istringstream dateStream(bill.getDueDate());
-        dateStream >> get_time(&dueTm, "%Y-%m-%d");
-        time_t dueTime = mktime(&dueTm);
+        tm dueTm = {};                               // create an empty tm structure to store the parsed date
+        istringstream dateStream(bill.getDueDate()); // create an input string stream from the bill's due date
+        dateStream >> get_time(&dueTm, "%Y-%m-%d");  // parse the date in "YYYY-MM-DD" format into the tm structure
+        time_t dueTime = mktime(&dueTm);             // convert the parsed tm structure into time_t
 
-        // Compare dates
-        if (dueTime < currentTime)
+        if (dueTime < currentTime) // compare dates to see if overdue
         {
-            // Create a new bill with updated status
             Bill overdueBill(
                 bill.getBillID(),
                 this->customerID,
@@ -339,17 +269,15 @@ void Customer::loadBillsFromDatabase(DatabaseManager &dbManager)
                 bill.getProviderID(),
                 bill.getAmount(),
                 bill.getDueDate(),
-                "Overdue");
+                "Overdue"); // new bill with updated status of overdue
 
-            // Replace the bill in the vector
-            bill = overdueBill;
+            bill = overdueBill; // replace the bill in the vector
 
-            // Update database
-            stringstream updateQuery;
-            updateQuery << "UPDATE bills SET Status = 'Overdue' WHERE BillID = " << bill.getBillID() << ";";
-            dbManager.executeQuery(updateQuery.str());
+            stringstream updateQuery;                                                                        // query var
+            updateQuery << "UPDATE bills SET Status = 'Overdue' WHERE BillID = " << bill.getBillID() << ";"; // update database query
+            dbManager.executeQuery(updateQuery.str());                                                       // call execute query
         }
     }
 
-    this->bills = bills;
+    this->bills = bills; // update bills list
 }

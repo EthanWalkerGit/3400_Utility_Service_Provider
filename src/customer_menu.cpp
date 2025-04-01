@@ -1,180 +1,189 @@
-#include "customer_menu.h"
-#include "customer.h"
-#include "databaseManager.h"
-#include "provider_menu.h"
+#include "customer_menu.h"   // include customer menu header
+#include "customer.h"        // include customer class
+#include "databaseManager.h" // include database manager class
+#include "provider_menu.h"   // include provider menu header
 
+// ************************************************************
+//
+//  Function: viewservices
+//
+//  Description: displays services filtered by provider id
+//
+// ************************************************************
 void viewservices(std::vector<UtilityService> &services, int providerID)
 {
-    bool found = false;
+    bool found = false; // flag to check if any service is found
 
-    for (const auto &service : services)
+    for (const auto &service : services) // iterate over services
     {
-        // If no provider is selected (-1), show all services.
-        // Otherwise, filter by providerID.
-        if (providerID == -1 || service.getPID() == providerID)
+        if (providerID == -1 || service.getPID() == providerID) // if no provider is selected show all services
         {
-            cout << "Service ID: " << service.getSID()
+            cout << "Service ID: " << service.getSID() // display service information
                  << " | Name: " << service.getName()
                  << " | Rate: " << service.getRate()
                  << " | Fixed Cost: " << service.getFC() << endl;
-            found = true;
+            found = true; // mark as found
         }
     }
-
-    if (!found)
+    if (!found) // check if no service was found
     {
-        cout << "No services available for this provider.\n";
+        cout << "No services available for this provider.\n"; // print message if no services found
     }
 }
 
+// ************************************************************
+//
+//  Function: customer_menu
+//
+//  Description: handles the customer menu interaction
+//
+// ************************************************************
 void customer_menu(vector<Customer> &customers, vector<UtilityService> &services, vector<provider> &providers, DatabaseManager &dbManager)
 {
-    int customerID;
-    cout << "Enter Customer ID: ";
-    cin >> customerID;
+    int customerID;                // variable to store customer id
+    cout << "Enter Customer ID: "; // prompt for customer id
+    cin >> customerID;             // recive user input
 
-    if (cin.fail()) // Check for invalid input
+    if (cin.fail()) // check for invalid input
     {
-        cin.clear();                                         // Clear the error state
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-        cout << "Invalid input! Please enter a valid Customer ID.\n";
-        return; // Return to the main menu
+        cin.clear();                                                  // clear error state
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');          // discard invalid input
+        cout << "Invalid input! Please enter a valid Customer ID.\n"; // print error message
+        return;                                                       // return to menu
     }
 
-    Customer *customer = Customer::login(customers, customerID);
+    Customer *customer = Customer::login(customers, customerID); // attempt login
     if (!customer)
     {
-        cout << "Invalid ID! Returning to main menu.\n";
-        return;
+        cout << "Invalid ID! Returning to main menu.\n"; // print error message
+        return;                                          // return to menu
     }
 
-    customer->loadBillsFromDatabase(dbManager);
-    int choice;
+    customer->loadBillsFromDatabase(dbManager); // load bills from database
+    int choice;                                 // store users menu choice
 
-    while (true)
+    while (true) // loop to iterate until user exits
     {
-        cout << "\n--- Customer Menu ---\n";
-        cout << "1. Search for service\n";
-        cout << "2. View bills\n";
-        cout << "3. Make a payment\n";
-        cout << "4. Logout\n";
-        cout << "Enter your choice: ";
+        cout << "\n--- Customer Menu ---\n"; // print menu header
+        cout << "1. Search for service\n";   // option to search for service
+        cout << "2. View bills\n";           // option to view bills
+        cout << "3. Make a payment\n";       // option to make payment
+        cout << "4. Logout\n";               // option to logout
+        cout << "Enter your choice: ";       // prompt for menu choice
 
-        cin >> choice;
+        cin >> choice; // recive users choice input
 
-        if (cin.fail()) // Check for invalid input
+        if (cin.fail()) // check for invalid input
         {
-            cin.clear();                                         // Clear the error state
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-            cout << "Invalid input! Please enter a number.\n";
-            continue; // Ask for input again
+            cin.clear();                                         // clear error state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // discard invalid input
+            cout << "Invalid input! Please enter a number.\n";   // print error message
+            continue;                                            // ask for input again
         }
 
-        switch (choice)
+        switch (choice) // switch statement to handle the differnt option cases
         {
-        case 1:
+        case 1: // search
         {
-            int providerChoice;
-            cout << "\n--- Available Providers ---\n";
-            for (size_t i = 0; i < providers.size(); ++i)
+            int providerChoice;                           // variable for provider choice
+            cout << "\n--- Available Providers ---\n";    // print provider header
+            for (size_t i = 0; i < providers.size(); ++i) // iterate over amount of providers
             {
-                cout << i + 1 << ". " << providers[i].getName() << endl;
+                cout << i + 1 << ". " << providers[i].getName() << endl; // print provider names
             }
-            cout << providers.size() + 1 << ". Exit\n";
-            cout << "Select a provider (or choose Exit to leave): ";
-            cin >> providerChoice;
+            cout << providers.size() + 1 << ". Exit\n";              // exit option
+            cout << "Select a provider (or choose Exit to leave): "; // prompt for provider selection
+            cin >> providerChoice;                                   // get user input for provider options
 
-            if (cin.fail()) // Check for invalid input
+            if (cin.fail()) // check for invalid input
             {
-                cin.clear();                                         // Clear the error state
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-                cout << "Invalid input! Please enter a valid number.\n";
-                continue; // Ask for input again
-            }
-
-            if (providerChoice == providers.size() + 1)
-            {
-                cout << "Exiting service search.\n";
-                break; // Exit the service search process
+                cin.clear();                                             // clear error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');     // discard invalid input
+                cout << "Invalid input! Please enter a valid number.\n"; // print error message
+                continue;                                                // ask for input again
             }
 
-            if (providerChoice < 1 || providerChoice > providers.size())
+            if (providerChoice == providers.size() + 1) // exit option is the last so check if user enteres 1+ last option
             {
-                cout << "Invalid choice. Try again.\n";
-                continue;
+                cout << "Exiting service search.\n"; // print exit message
+                break;                               // exit service search process
             }
 
-            int providerID = providerChoice - 1; // 0-based index
-            int serviceID;
-
-            cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n";
-            viewservices(services, providerID); // Display available services
-
-            while (true)
+            if (providerChoice < 1 || providerChoice > providers.size()) // check for invalid range integers
             {
-                cout << "Enter the Service ID to subscribe to (0 to go back): ";
-                cin >> serviceID;
+                cout << "Invalid choice. Try again.\n"; // print error message
+                continue;                               // allow user to retry
+            }
 
-                if (cin.fail()) // Check for invalid input
+            int providerID = providerChoice - 1; // convert to 0-based index
+            int serviceID;                       // variable for service id
+
+            cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n"; // print provider services header
+            viewservices(services, providerID);                                                   // display available services
+
+            while (true) // loop to iterate until user exits
+            {
+                cout << "Enter the Service ID to subscribe to (0 to go back): "; // prompt for service id
+                cin >> serviceID;                                                // recive user input for a service id
+
+                if (cin.fail()) // check for invalid input
                 {
-                    cin.clear();                                         // Clear the error state
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-                    cout << "Invalid input! Please enter a valid number.\n";
-                    continue; // Ask for input again
+                    cin.clear();                                             // clear error state
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');     // discard invalid input
+                    cout << "Invalid input! Please enter a valid number.\n"; // print error message
+                    continue;                                                // ask for input again
                 }
 
-                if (serviceID == 0) // Go back to providers list
+                if (serviceID == 0) // go back to provider list
                 {
-                    break;
+                    break; // exit this loop and go back to provider list loop
                 }
 
-                // Check if the entered Service ID is valid
-                bool validService = false;
-                for (const auto &service : services)
+                bool validService = false;           // flag for valid service
+                for (const auto &service : services) // iterate over services to see if 1 matches the users input
                 {
-                    if (service.getSID() == serviceID && service.getPID() == providerID)
+                    if (service.getSID() == serviceID && service.getPID() == providerID) // check if entered service id is valid
                     {
-                        validService = true;
-                        break;
+                        validService = true; // mark as valid
+                        break;               // return to previous loop
                     }
                 }
 
-                if (validService)
+                if (validService) // if service exists
                 {
-                    // Proceed to subscribe to the service
-                    customer->subscribeToService(dbManager, services, providers, providerID, serviceID);
-                    break; // Exit after subscription
+                    customer->subscribeToService(dbManager, services, providers, providerID, serviceID); // proceed to subscribe to service
+                    break;                                                                               // exit after subscription
                 }
-                else
+                else // not valid
                 {
-                    cout << "Invalid Service ID. Please try again.\n";
+                    cout << "Invalid Service ID. Please try again.\n"; // print error message
                 }
             }
-            break; // Exit after provider selection
+            break; // exit provider selection
         }
-        case 2:
-            customer->viewBill();
-            break;
-        case 3:
-            int billID;
-            cout << "Enter Bill ID to pay: ";
-            cin >> billID;
+        case 2:                               // view bills
+            customer->viewBill();             // view bill details function call
+            break;                            // exit view case
+        case 3:                               // make payment
+            int billID;                       // variable for bill id
+            cout << "Enter Bill ID to pay: "; // prompt for bill id
+            cin >> billID;                    // recive user input into bill id
 
-            if (cin.fail()) // Check for invalid input
+            if (cin.fail()) // check for invalid input
             {
-                cin.clear();                                         // Clear the error state
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-                cout << "Invalid input! Please enter a valid Bill ID.\n";
-                continue; // Ask for input again
+                cin.clear();                                              // clear error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');      // discard invalid input
+                cout << "Invalid input! Please enter a valid Bill ID.\n"; // print error message
+                continue;                                                 // ask for input again
             }
 
-            customer->makePayment(billID, dbManager);
-            break;
-        case 4:
-            cout << "Logging out...\n";
-            return; // Log out and return to main menu
-        default:
-            cout << "Invalid choice. Try again.\n";
+            customer->makePayment(billID, dbManager); // call make payment function with biill id so it can be identified
+            break;                                    // exit payment case
+        case 4:                                       // logout
+            cout << "Logging out...\n";               // print logout message
+            return;                                   // return to main menu
+        default:                                      // if none of the main 4
+            cout << "Invalid choice. Try again.\n";   // print error message
         }
     }
 }

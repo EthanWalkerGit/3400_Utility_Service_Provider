@@ -1,81 +1,89 @@
-#include <iostream>
-#include <vector>
-#include "customer_menu.h"
-#include "provider_menu.h"
-#include "databaseManager.h"
+#include <iostream>          // for i/o
+#include <vector>            // for vector conatiner
+#include "customer_menu.h"   // include customer_menu class
+#include "provider_menu.h"   // include provider_menu class
+#include "databaseManager.h" // include db manager class
 
-using namespace std;
+using namespace std; // use standard namespace
 
+// ************************************************************
+//
+//  Function: main
+//
+//  Description: runs program
+//
+// ************************************************************
 int main()
 {
-    DatabaseManager dbManager;
+    DatabaseManager dbManager; // create db manager object
 
-    if (!dbManager.openDatabase("utilityproviders.db"))
+    if (!dbManager.openDatabase("utilityproviders.db")) // ensure no error when opening database
     {
-        return 1;
+        return 1; // open failed
     }
 
-    vector<provider> providers;
-    vector<UtilityService> services;
-    vector<Customer> customers;
+    vector<provider> providers;      // vector for providers
+    vector<UtilityService> services; // vector for services
+    vector<Customer> customers;      // vector for customers
 
-    dbManager.LoadData(providers, services, customers);
+    dbManager.LoadData(providers, services, customers); // call load data to populate vectors
 
-    while (true)
+    while (true) // iterate until user exits
     {
-        cout << "\n--- Utility Billing System ---\n";
-        cout << "1. Login as Customer\n";
-        cout << "2. Login as Provider\n";
-        cout << "3. Register as Customer\n";
-        cout << "4. Register as Provider\n";
-        cout << "5. Exit\n";
-        cout << "Enter your choice: ";
+        cout << "\n--- Utility Billing System ---\n"; // header
+        cout << "1. Login as Customer\n";             // login as customer option
+        cout << "2. Login as Provider\n";             // login as provider option
+        cout << "3. Register as Customer\n";          // reg as customer option
+        cout << "4. Register as Provider\n";          //  reg as provider option
+        cout << "5. Exit\n";                          // exit option
+        cout << "Enter your choice: ";                // prompt for option
 
-        int choice;
-        cin >> choice;
+        int choice;    // var for user input choice
+        cin >> choice; // get choice
 
-        if (cin.fail()) // If the user enters invalid input (non-integer)
+        if (cin.fail()) // if the user enters invalid input (non-integer)
         {
-            cin.clear();                                         // Clear the error flag
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cin.clear();                                         // clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // discard invalid input
             cout << "Invalid input! Please enter a number.\n";
-            continue; // Skip the rest of the loop and prompt for input again
+            continue; // skip the rest of the loop and prompt for input again
         }
 
-        if (choice == 1) // Customer Login
+        if (choice == 1) // customer Login
         {
-            customer_menu(customers, services, providers, dbManager);
+            customer_menu(customers, services, providers, dbManager); // fork and go to the customer menu
         }
-        else if (choice == 2) // Provider Login
+        else if (choice == 2) // provider Login
         {
-            provider_menu(providers, services, dbManager);
+            provider_menu(providers, services, dbManager); // fork and go to the provider menu
         }
-        else if (choice == 3) // Register Customer
+        else if (choice == 3) // register customer
         {
-            string name, address;
-            int id = customers.size() + 1;
-            cout << "\nEnter Name: ";
-            cin.ignore();
-            getline(cin, name);
-            cout << "Enter Address: ";
-            getline(cin, address);
-            Customer::registerAccount(customers, id, name, address, dbManager);
+            string name, address;          // vars for customer info
+            int id = customers.size() + 1; // increase size of customer vector
+            cout << "\nEnter Name: ";      // prompt for name
+            cin.ignore();                  // ignore unwanted parts of input
+            getline(cin, name);            // get input
+            cout << "Enter Address: ";     // prompt for address
+            getline(cin, address);         // get address
+
+            Customer::registerAccount(customers, id, name, address, dbManager); // create new customer using constructor
         }
-        else if (choice == 4) // Register Provider
+        else if (choice == 4) // register provider
         {
-            add_provider(providers, dbManager);
+            add_provider(providers, dbManager); // call add provider function in provider class
         }
-        else if (choice == 5) // Exit
+        else if (choice == 5) // exit
         {
             cout << "Exiting...\n";
-            break;
+            break; // exit loop
         }
-        else
+        else // invalid input repreat loop
         {
             cout << "Invalid choice! Try again.\n";
         }
     }
 
-    dbManager.closeDatabase();
+    dbManager.closeDatabase(); // close db
     return 0;
 }
