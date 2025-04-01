@@ -35,8 +35,9 @@ public:
     // closes database connection
     void closeDatabase();
     // Overloaded versions of executeQuery
-    bool executeQuery(const string &query);                      // Original version
-    bool executeQuery(const string &query, vector<Bill> &bills); // New version
+    bool executeQuery(const string &query);                                       // Original version
+    bool executeQuery(const string &query, vector<Bill> &bills);                  // New version
+    vector<vector<string>> executeQuery(const string &query, bool returnResults); // New version that returns results as a 2D vector
     int getLastInsertId();
     int getNextBillID();
     void initTables();

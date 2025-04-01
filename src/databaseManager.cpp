@@ -98,6 +98,39 @@ bool DatabaseManager::executeQuery(const string &query, vector<Bill> &bills)
     return true;
 }
 
+// Overloaded executeQuery with vector parameter
+vector<vector<string>> DatabaseManager::executeQuery(const string &query, bool returnResults)
+{
+    vector<vector<string>> results;
+
+    if (!db)
+    {
+        cerr << "Database is not open!" << endl;
+        return results; // Return empty results
+    }
+
+    char *errMsg = nullptr;
+    int rc = sqlite3_exec(db, query.c_str(), [](void *data, int argc, char **argv, char **colNames) -> int
+                          {
+        vector<vector<string>> *results = static_cast<vector<vector<string>>*>(data);
+        vector<string> row;
+        for (int i = 0; i < argc; ++i)
+        {
+            row.push_back(argv[i] ? argv[i] : "NULL");
+        }
+        results->push_back(row);
+        return 0; }, &results, &errMsg);
+
+    if (rc != SQLITE_OK)
+    {
+        cerr << "SQL error: " << errMsg << endl;
+        sqlite3_free(errMsg);
+        return {}; // Return empty results on error
+    }
+
+    return results;
+}
+
 // Define the callback function that fills the vector with results
 int DatabaseManager::callbackFunction(void *data, int argc, char **argv, char **azColName)
 {
@@ -264,7 +297,7 @@ void DatabaseManager::LoadData(vector<provider> &providers, vector<UtilityServic
         int pid = sqlite3_column_int(stmt_p, 0);
         string p_name = reinterpret_cast<const char *>(sqlite3_column_text(stmt_p, 1));
         double sales = sqlite3_column_double(stmt_s, 2);
-        providers.emplace_back(pid, p_name , sales);
+        providers.emplace_back(pid, p_name, sales);
     }
     while (sqlite3_step(stmt_s) == SQLITE_ROW)
     {

@@ -15,23 +15,6 @@ double setFC()
     return fc;
 }
 
-/*
-void view_services(vector<UtilityService> &services, int pid)
-{
-    int count =0;
-    cout << "\n---Current Services ---\n";
-    for (const auto &s : services)
-    {
-        if (s.getPID() == pid)
-        {
-            cout << "\nService id:" << s.getSID() << "----Service Name " << s.getName() << "----Rate: " << s.getRate() << "----Fixed Cost: " << s.getFC() << endl;
-            count++;
-        }
-    }
-    if (count == 0){
-        cout << "No services\n";
-    }
-}*/
 void view_services(vector<UtilityService> &services, vector<provider> &providers, int pid = -1)
 {
     string provider_name = "All Providers";
@@ -58,6 +41,25 @@ void view_services(vector<UtilityService> &services, vector<provider> &providers
                  << " | Fixed Cost: $" << service.getFC() << endl;
         }
     }
+}
+
+void view_sales(vector<provider> &providers, int pid, DatabaseManager &dbManager)
+{
+    double sales = 0.0;
+    stringstream query_ss;
+    query_ss << "SELECT Sales FROM providers WHERE providerID = " << pid << ";";
+    const string query = query_ss.str();
+
+    // Call executeQuery and get the result
+    vector<vector<string>> result = dbManager.executeQuery(query, true);
+
+    // Check if the result contains valid data
+    if (!result.empty() && !result[0].empty())
+    {
+        sales = stod(result[0][0]); // Convert the first sales value to a double
+    }
+
+    cout << "\nTotal Sales for Provider ID " << pid << ": $" << sales << endl;
 }
 
 void add_service(vector<UtilityService> &services, vector<provider> &providers, int pid, DatabaseManager &dbManager)
@@ -289,7 +291,8 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
         cout << "2. Add Service\n";
         cout << "3. Edit Service\n";
         cout << "4. Delete Service\n";
-        cout << "5. Exit\n";
+        cout << "5. View Sales\n"; // Added option
+        cout << "6. Exit\n";
         cout << "Enter your choice: ";
         cin >> opp;
 
@@ -311,15 +314,19 @@ void provider_menu(vector<provider> &providers, vector<UtilityService> &services
         }
         else if (opp == 5)
         {
-            cout << "exiting menu..." << endl;
+            view_sales(providers, pid, dbManager); // Call view_sales
+        }
+        else if (opp == 6)
+        {
+            cout << "Exiting menu..." << endl;
         }
         else
         {
-            cout << "enter vaild choice\n";
+            cout << "Enter a valid choice\n";
             continue;
         }
 
-    } while (opp != 5);
+    } while (opp != 6);
 }
 
 void add_provider(vector<provider> &providers, DatabaseManager &dbManager)
