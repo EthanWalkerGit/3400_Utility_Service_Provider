@@ -16,7 +16,7 @@ void viewservices(std::vector<UtilityService> &services, int providerID)
 
     for (const auto &service : services) // iterate over services
     {
-        if (providerID == -1 || service.getPID() == providerID) // if no provider is selected show all services
+        if (providerID == -1 || service.getPID() == providerID + 1) // if no provider is selected show all services
         {
             cout << "Service ID: " << service.getSID() // display service information
                  << " | Name: " << service.getName()
