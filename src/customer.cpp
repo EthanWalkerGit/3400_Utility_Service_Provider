@@ -141,6 +141,7 @@ void Customer::makePayment(int billID, DatabaseManager &dbManager)
         if (bill.getBillID() == billID) // check if bill exists
         {
             double amount = bill.getAmount();      // get bills value
+            amount = amount * (billID * 100);      // simulate random val
             int providerID = bill.getProviderID(); // get proivder id associated with bill
 
             bill.markPaid(); // update the bill status
