@@ -16,7 +16,7 @@ void viewservices(std::vector<UtilityService> &services, int providerID)
 
     for (const auto &service : services) // iterate over services
     {
-        if (providerID == -1 || service.getPID() == providerID + 1) // if no provider is selected show all services
+        if (providerID == -1 || service.getPID() == providerID) // if no provider is selected show all services
         {
             cout << "Service ID: " << service.getSID() // display service information
                  << " | Name: " << service.getName()
@@ -115,8 +115,8 @@ void customer_menu(vector<Customer> &customers, vector<UtilityService> &services
                 continue;                               // allow user to retry
             }
 
-            int providerID = providerChoice - 1; // convert to 0-based index
-            int serviceID;                       // variable for service id
+            int providerID = providerChoice; // convert to 0-based index
+            int serviceID;                   // variable for service id
 
             cout << "\n--- " << providers[providerID].getName() << "'s Available Services ---\n"; // print provider services header
             viewservices(services, providerID);                                                   // display available services

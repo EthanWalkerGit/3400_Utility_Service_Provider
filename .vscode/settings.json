@@ -52,6 +52,23 @@
         "xutility": "cpp",
         "vector": "cpp",
         "sstream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "__bit_reference": "cpp",
+        "__locale": "cpp",
+        "__threading_support": "cpp",
+        "__verbose_abort": "cpp",
+        "array": "cpp",
+        "bitset": "cpp",
+        "cstdarg": "cpp",
+        "cwctype": "cpp",
+        "execution": "cpp",
+        "mutex": "cpp",
+        "optional": "cpp",
+        "print": "cpp",
+        "queue": "cpp",
+        "ratio": "cpp",
+        "stack": "cpp",
+        "string_view": "cpp",
+        "variant": "cpp"
     }
 }
